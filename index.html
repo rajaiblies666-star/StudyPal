@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyPal — Platform Belajar Kolaboratif (Prototype)</title>
+  <style>
+    /* ===== Global styles ===== */
+    :root{
+      --bg:#f6fbff;
+      --card:#ffffff;
+      --primary:#0b6fb6; /* main blue */
+      --primary-600:#075691;
+      --muted:#6b7b8c;
+      --accent:#e8f4ff;
+      --glass: rgba(255,255,255,0.6);
+      --radius:12px;
+      --shadow: 0 6px 18px rgba(11,111,182,0.08);
+      --mono: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--mono);
+      background: linear-gradient(180deg, var(--bg) 0%, #f1f7fc 100%);
+      color:#16324f;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:60px;
+    }
+
+    /* ===== Header ===== */
+    header{
+      position:sticky;
+      top:0;
+      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.6);
+      border-bottom:1px solid #e6eef8;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 20px;
+      z-index:50;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-600));
+      display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
+      font-size:18px;box-shadow:var(--shadow);
+    }
+    .brand h1{margin:0;font-size:18px}
+    nav{display:flex;gap:10px;align-items:center}
+    .btn{
+      padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600;
+      background:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(11,111,182,0.12)
+    }
+    .btn.secondary{
+      background:transparent;color:var(--primary);border:1px solid rgba(11,111,182,0.12);
+      box-shadow:none;font-weight:600;
+    }
+    .user-chip{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(11,111,182,0.06);color:var(--primary);font-weight:600}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* ===== Hero ===== */
+    .container{max-width:1100px;margin:28px auto;padding:0 18px}
+    .hero{
+      display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:center;
+    }
+    .hero-card{
+      background:var(--card);padding:28px;border-radius:16px;box-shadow:var(--shadow);
+    }
+    .hero h2{margin:0 0 6px;font-size:24px}
+    .hero p{margin:0 0 16px;color:var(--muted)}
+    .hero-actions{display:flex;gap:12px;align-items:center}
+
+    /* ===== Dashboard cards ===== */
+    .grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px;
+    }
+    .card{
+      background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);
+    }
+    .subject{
+      display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid #f1f6fb;
+    }
+    .subject .icon{
+      width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
+    }
+    .s-math{background:linear-gradient(135deg,#0b6fb6,#3aa0ff)}
+    .s-phys{background:linear-gradient(135deg,#ff8a65,#ffb86b)}
+    .s-bio{background:linear-gradient(135deg,#4caf50,#8bdc91)}
+    .s-eng{background:linear-gradient(135deg,#9c27b0,#c18ce8)}
+
+    /* ===== Group & forum view ===== */
+    .layout{
+      display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px;
+    }
+    .sidebar{
+      position:sticky;top:84px;align-self:start;
+    }
+    .group-list{display:flex;flex-direction:column;gap:10px}
+    .group-item{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6fc;cursor:pointer}
+    .group-item.active{border:2px solid var(--primary);box-shadow:0 8px 20px rgba(11,111,182,0.06)}
+    .new-group{display:flex;gap:8px;margin-top:12px}
+    .input{padding:10px;border-radius:10px;border:1px solid #e6eef8;flex:1}
+
+    /* forum */
+    .forum{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .post{
+      padding:12px;border-radius:10px;background:var(--card);border:1px solid #eef6fb;box-shadow:var(--shadow);
+    }
+    .post .meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+    .reply-list{margin-top:8px;display:flex;flex-direction:column;gap:8px;padding-left:8px}
+
+    /* footer */
+    footer{display:flex;justify-content:center;padding:18px;margin-top:30px;color:var(--muted)}
+
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(6,20,36,0.36);display:none;align-items:center;justify-content:center;z-index:90}
+    .modal{background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:640px;box-shadow:0 16px 40px rgba(6,20,36,0.18)}
+    .modal.show{display:block}
+
+    /* responsive */
+    @media (max-width:880px){
+      .hero{grid-template-columns:1fr;gap:14px}
+      .layout{grid-template-columns:1fr;align-items:start}
+      .sidebar{position:static}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+    <div class="logo" style="background:none;box-shadow:none;padding:0;">
+  <img src="https://iili.io/Kslta2e.png" alt="StudyPal Logo" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+</div>
+
+      <div>
+        <h1>StudyPal</h1>
+        <div class="small">Belajar kolaboratif untuk SMA</div>
+      </div>
+    </div>
+    <nav>
+      <button class="btn" id="btn-quiz">Kuis Cepat</button>
+      <button class="btn secondary" id="btn-login">Login / Register</button>
+      <div id="userArea" style="display:none" class="user-chip"></div>
+    </nav>
+  </header>
+
+  <main class="container" id="app">
+    <!-- Hero -->
+    <section class="hero-card hero">
+      <div>
+        <h2>Belajar lebih mudah bersama teman — kapan saja, di mana saja</h2>
+        <p>StudyPal membantu siswa SMA membentuk grup belajar, berdiskusi, dan latihan soal interaktif. Cocok untuk tugas kelompok & persiapan ujian.</p>
+        <div class="hero-actions">
+          <button class="btn" id="startBtn">Mulai Belajar Sekarang</button>
+          <button class="btn secondary" id="learnMore">Lihat Fitur</button>
+        </div>
+
+        <!-- Highlights -->
+        <div class="grid" style="margin-top:18px">
+          <div class="card">
+            <strong>Forum Diskusi</strong>
+            <div class="small" style="margin-top:6px">Tanya jawab & solusi soal antar siswa.</div>
+          </div>
+          <div class="card">
+            <strong>Grup Belajar</strong>
+            <div class="small" style="margin-top:6px">Buat grup sesuai kelas atau topik.</div>
+          </div>
+          <div class="card">
+            <strong>Kuis Interaktif</strong>
+            <div class="small" style="margin-top:6px">Latihan singkat untuk memperkuat pemahaman.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right card: quick access -->
+      <aside class="hero-card" style="text-align:center">
+        <h3 style="margin-bottom:6px">Dashboard Cepat</h3>
+        <p class="small">Pilih mata pelajaran untuk mulai bergabung di grup & berdiskusi</p>
+        <div style="margin-top:12px" id="subjectQuick">
+          <div class="subject" style="margin-bottom:10px;cursor:pointer" data-sub="Matematika">
+          <div class="logo" style="background:none;box-shadow:none;padding:0;">
+  <img src="https://iili.io/Ks0qStI.jpg" alt="Matematika" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+</div>
+            <div>
+              <div style="font-weight:700">Matematika</div>
+              <div class="small">Soal & diskusi</div>
+            </div>
+          </div>
+
+          <div class="subject" style="margin-bottom:10px;cursor:pointer" data-sub="Fisika">
+           <div class="logo" style="background:none;box-shadow:none;padding:0;">
+  <img src="https://iili.io/Ks02WNt.gif" alt="Fisika" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+</div>
+            <div>
+              <div style="font-weight:700">Fisika</div>
+              <div class="small">Konsep & percobaan</div>
+            </div>
+          </div>
+
+          <div class="subject" style="margin-bottom:10px;cursor:pointer" data-sub="Biologi">
+           <div class="logo" style="background:none;box-shadow:none;padding:0;">
+  <img src="https://iili.io/Ks0KMHQ.jpg" alt="Biologi" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+</div>
+            <div>
+              <div style="font-weight:700">Biologi</div>
+              <div class="small">Diagram & klasifikasi</div>
+            </div>
+          </div>
+
+          <div class="subject" style="cursor:pointer" data-sub="Bahasa Inggris">
+           <div class="logo" style="background:none;box-shadow:none;padding:0;">
+  <img src="https://iili.io/Ks0CamQ.jpg" alt="Bahasa Inggris" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
+</div>
+            <div>
+              <div style="font-weight:700">Bahasa Inggris</div>
+              <div class="small">Diskusi & latihan</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Main layout: sidebar groups + forum -->
+    <section id="mainArea" style="display:none" class="layout">
+      <div class="sidebar card">
+        <h3 style="margin:0 0 8px 0">Grup Study</h3>
+        <div class="small">Pilih grup atau buat yang baru</div>
+        <div id="groupList" class="group-list" style="margin-top:12px"></div>
+
+        <div class="new-group">
+          <input id="newGroupName" class="input" placeholder="Nama grup (contoh: Kelas 11 IPA 1)"/>
+          <button class="btn" id="btnCreateGroup">Buat</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="groupHeader">
+          <h2 style="margin:0">Pilih Grup</h2>
+          <div class="small">Gabung ke grup untuk melihat forum</div>
+        </div>
+
+        <div id="forumArea" style="margin-top:12px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 id="groupTitle" style="margin:0">Group Title</h3>
+              <div class="small" id="groupMeta">Mata pelajaran • 0 anggota</div>
+            </div>
+            <div>
+              <button class="btn secondary" id="btnLeave">Keluar</button>
+              <button class="btn" id="btnJoin">Gabung</button>
+            </div>
+          </div>
+
+          <!-- Post composer -->
+          <div style="margin-top:12px" class="post">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700" id="avatarInitial">A</div>
+              <div style="flex:1">
+                <textarea id="postText" rows="3" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eef6fb;resize:vertical" placeholder="Tulis pertanyaan atau catatan..."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                  <div class="small">Tambahkan gambar atau link (opsional)</div>
+                  <div>
+                    <button class="btn secondary" id="btnClearPost">Bersihkan</button>
+                    <button class="btn" id="btnPost">Kirim</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Post list -->
+          <div id="postsContainer" style="margin-top:12px"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <div class="small">Prototype StudyPal • Dibuat untuk tugas SMA • Data tersimpan lokal di browser</div>
+    </footer>
+  </main>
+
+  <!-- Modal: Login/Register -->
+  <div id="modal" class="modal-backdrop">
+    <div class="modal">
+      <h3 id="modalTitle">Login / Register</h3>
+      <p class="small" id="modalDesc">Masukkan nama pengguna untuk mulai menggunakan StudyPal</p>
+      <input id="inputName" class="input" placeholder="Nama lengkap atau nama panggilan"/>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn secondary" id="modalCancel">Batal</button>
+        <button class="btn" id="modalSave">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Quiz -->
+  <div id="modalQuiz" class="modal-backdrop">
+    <div class="modal" style="max-width:520px">
+      <h3>Kuis Cepat</h3>
+      <p class="small">3 soal singkat — latihan cepat untuk tugas.</p>
+      <div id="quizContent" style="margin-top:8px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div id="quizResult" class="small"></div>
+        <div>
+          <button class="btn secondary" id="quizClose">Tutup</button>
+          <button class="btn" id="quizSubmit">Kirim Jawaban</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /***************
+     * StudyPal Prototype JS
+     * - Simple SPA behavior
+     * - localStorage for persistence (groups & posts & username)
+     ***************/
+
+    // --- Initial data ---
+    const SUBJECTS = ["Matematika","Fisika","Biologi","Bahasa Inggris"];
+    const SAMPLE_GROUPS = [
+      { id: genId(), name: "Kelas 11 IPA 1", subject: "Matematika", members: [], posts: [] },
+      { id: genId(), name: "Persiapan UN 12 IPA", subject: "Fisika", members: [], posts: [] },
+      { id: genId(), name: "Biologi: Ekologi", subject: "Biologi", members: [], posts: [] },
+      { id: genId(), name: "Reading Club", subject: "Bahasa Inggris", members: [], posts: [] }
+    ];
+    const STORAGE_KEY = 'studypal_data_v1';
+    const STORAGE_USER = 'studypal_user_v1';
+
+    // --- util ---
+    function genId(){ return 'id-' + Math.random().toString(36).slice(2,9) }
+    function saveData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }
+    function loadData(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
+      try{ return JSON.parse(raw) } catch(e){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
+    }
+
+    // --- state ---
+    let groups = loadData(); // array of group objects
+    let currentUser = localStorage.getItem(STORAGE_USER) || null;
+    let currentGroupId = null;
+
+    // --- elements ---
+    const btnLogin = document.getElementById('btn-login');
+    const userArea = document.getElementById('userArea');
+    const modal = document.getElementById('modal');
+    const modalSave = document.getElementById('modalSave');
+    const modalCancel = document.getElementById('modalCancel');
+    const inputName = document.getElementById('inputName');
+    const startBtn = document.getElementById('startBtn');
+    const mainArea = document.getElementById('mainArea');
+    const subjectQuick = document.getElementById('subjectQuick');
+    const groupListEl = document.getElementById('groupList');
+    const btnCreateGroup = document.getElementById('btnCreateGroup');
+    const newGroupName = document.getElementById('newGroupName');
+    const forumArea = document.getElementById('forumArea');
+    const groupTitle = document.getElementById('groupTitle');
+    const groupMeta = document.getElementById('groupMeta');
+    const postsContainer = document.getElementById('postsContainer');
+    const postText = document.getElementById('postText');
+    const btnPost = document.getElementById('btnPost');
+    const btnClearPost = document.getElementById('btnClearPost');
+    const avatarInitial = document.getElementById('avatarInitial');
+    const btnJoin = document.getElementById('btnJoin');
+    const btnLeave = document.getElementById('btnLeave');
+    const btnQuiz = document.getElementById('btn-quiz');
+    const modalQuiz = document.getElementById('modalQuiz');
+    const quizContent = document.getElementById('quizContent');
+    const quizSubmit = document.getElementById('quizSubmit');
+    const quizClose = document.getElementById('quizClose');
+    const quizResult = document.getElementById('quizResult');
+
+    // --- init UI ---
+    function init(){
+      refreshUserUI();
+      renderSubjectQuick();
+      renderGroupList();
+      attachListeners();
+      // If user logged in, show dashboard
+      if(currentUser) {
+        document.getElementById('startBtn').textContent = 'Buka Dashboard';
+      }
+    }
+
+    function refreshUserUI(){
+      if(currentUser){
+        btnLogin.style.display='none';
+        userArea.style.display='flex';
+        userArea.textContent = currentUser;
+        avatarInitial.textContent = currentUser.slice(0,1).toUpperCase();
+      } else {
+        btnLogin.style.display='inline-block';
+        userArea.style.display='none';
+      }
+    }
+
+    // --- render quick subjects ---
+    function renderSubjectQuick(){
+      subjectQuick.querySelectorAll('.subject').forEach(el=>{
+        el.addEventListener('click', ()=> {
+          const sub = el.dataset.sub;
+          openDashboardForSubject(sub);
+        })
+      })
+    }
+
+    // --- open dashboard for subject ---
+    function openDashboardForSubject(subject){
+      // show mainArea and filter groups to subject
+      mainArea.style.display='grid';
+      renderGroupList(subject);
+    }
+
+    // --- render groups (optionally filtered by subject) ---
+    function renderGroupList(subjectFilter){
+      groupListEl.innerHTML = '';
+      const filtered = subjectFilter ? groups.filter(g => g.subject === subjectFilter) : groups;
+      filtered.forEach(g=>{
+        const el = document.createElement('div');
+        el.className = 'group-item' + (g.id === currentGroupId ? ' active' : '');
+        el.dataset.id = g.id;
+        el.innerHTML = `<strong>${g.name}</strong><div class="small" style="margin-top:6px">${g.subject} • ${g.members.length} anggota</div>`;
+        el.addEventListener('click', ()=> openGroup(g.id));
+        groupListEl.appendChild(el);
+      });
+    }
+
+    // --- open group view ---
+    function openGroup(groupId){
+      const g = groups.find(x=>x.id===groupId);
+      if(!g) return;
+      currentGroupId = groupId;
+      forumArea.style.display = 'block';
+      groupTitle.textContent = g.name;
+      groupMeta.textContent = `${g.subject} • ${g.members.length} anggota`;
+      // if user is member
+      const isMember = currentUser && g.members.includes(currentUser);
+      btnJoin.style.display = isMember ? 'none' : 'inline-block';
+      btnLeave.style.display = isMember ? 'inline-block' : 'none';
+      avatarInitial.textContent = currentUser ? currentUser.slice(0,1).toUpperCase() : 'A';
+      renderPosts(g.posts);
+      renderGroupList(); // update active class
+    }
+
+    // --- render posts ---
+    function renderPosts(posts){
+      postsContainer.innerHTML = '';
+      if(!posts || posts.length===0){
+        postsContainer.innerHTML = `<div class="small">Belum ada postingan di grup ini. Ajak teman untuk berdiskusi!</div>`;
+        return;
+      }
+      posts.slice().reverse().forEach(post=>{
+        const el = document.createElement('div');
+        el.className = 'post';
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-weight:700">${escapeHtml(post.author)}</div>
+              <div class="meta">${new Date(post.time).toLocaleString()} • <span class="small">${post.title || 'Pertanyaan'}</span></div>
+            </div>
+            <div class="small" style="color:var(--muted)">${post.upvotes || 0} 👍</div>
+          </div>
+          <div style="margin-top:8px">${escapeHtml(post.content).replace(/\n/g,'<br>')}</div>
+          <div class="reply-list" id="replies-${post.id}">
+            ${post.replies && post.replies.length ? post.replies.map(r => `<div style="background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #eef6fb"><strong>${escapeHtml(r.author)}</strong> <div class="small">${new Date(r.time).toLocaleString()}</div><div style="margin-top:6px">${escapeHtml(r.text)}</div></div>`).join('') : ''}
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input placeholder="Tulis balasan..." class="input" id="reply-input-${post.id}" />
+            <button class="btn secondary" onclick="handleReply('${post.id}')">Kirim</button>
+            <button class="btn" onclick="handleUpvote('${post.id}')">👍 Upvote</button>
+          </div>
+        `;
+        postsContainer.appendChild(el);
+      });
+    }
+
+    // --- make new group ---
+    function createGroup(name, subject){
+      const g = { id: genId(), name: name || ('Grup ' + Math.floor(Math.random()*100)), subject: subject || SUBJECTS[0], members: [], posts: [] };
+      groups.push(g);
+      saveData(groups);
+      renderGroupList();
+      return g;
+    }
+
+    // --- post to group ---
+    function postToGroup(groupId, title, content){
+      const g = groups.find(x=>x.id===groupId);
+      if(!g) return;
+      const post = { id: genId(), author: currentUser||'Anonim', title: title||'', content: content||'', time: Date.now(), upvotes:0, replies:[] };
+      g.posts = g.posts || [];
+      g.posts.push(post);
+      saveData(groups);
+      renderPosts(g.posts);
+    }
+
+    // --- reply handler (global function called from inline onclick) ---
+    window.handleReply = function(postId){
+      const input = document.getElementById('reply-input-'+postId);
+      if(!input) return;
+      const text = input.value.trim();
+      if(!text) return alert('Isi balasan dulu.');
+      const g = groups.find(x=>x.id===currentGroupId);
+      if(!g) return;
+      const p = g.posts.find(pp=>pp.id===postId);
+      if(!p) return;
+      p.replies = p.replies || [];
+      p.replies.push({ id: genId(), author: currentUser||'Anonim', text, time: Date.now() });
+      saveData(groups);
+      renderPosts(g.posts);
+    }
+
+    // --- upvote handler ---
+    window.handleUpvote = function(postId){
+      const g = groups.find(x=>x.id===currentGroupId);
+      const p = g.posts.find(pp=>pp.id===postId);
+      p.upvotes = (p.upvotes || 0) + 1;
+      saveData(groups);
+      renderPosts(g.posts);
+    }
+
+    // --- attach listeners ---
+    function attachListeners(){
+      btnLogin.addEventListener('click', ()=> openModal());
+      startBtn.addEventListener('click', ()=>{
+        if(!currentUser) openModal();
+        else {
+          mainArea.style.display='grid';
+          renderGroupList();
+        }
+      });
+      modalCancel.addEventListener('click', ()=> closeModal());
+      modalSave.addEventListener('click', ()=>{
+        const name = inputName.value.trim();
+        if(!name) return alert('Isi nama dulu.');
+        currentUser = name;
+        localStorage.setItem(STORAGE_USER, currentUser);
+        closeModal();
+        refreshUserUI();
+        document.getElementById('startBtn').textContent = 'Buka Dashboard';
+      });
+
+      // quick create group
+      btnCreateGroup.addEventListener('click', ()=>{
+        const name = newGroupName.value.trim();
+        if(!name) return alert('Masukkan nama grup.');
+        // default subject: first subject (or could infer)
+        const g = createGroup(name, SUBJECTS[0]);
+        newGroupName.value='';
+        openGroup(g.id);
+      });
+
+      btnPost.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const text = postText.value.trim();
+        if(!text) return alert('Tulis pertanyaan atau catatan terlebih dahulu.');
+        postToGroup(currentGroupId, '', text);
+        postText.value='';
+      });
+      btnClearPost.addEventListener('click', ()=> postText.value='');
+
+      btnJoin.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const g = groups.find(x=>x.id===currentGroupId);
+        if(!g) return;
+        if(!g.members.includes(currentUser)) g.members.push(currentUser);
+        saveData(groups);
+        openGroup(g.id);
+      });
+      btnLeave.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const g = groups.find(x=>x.id===currentGroupId);
+        if(!g) return;
+        g.members = g.members.filter(m=>m!==currentUser);
+        saveData(groups);
+        openGroup(g.id);
+      });
+
+      // click subject from right card
+      document.querySelectorAll('[data-sub]').forEach(el=>{
+        el.addEventListener('click', ()=> {
+          openDashboardForSubject(el.dataset.sub);
+        })
+      })
+
+      // quiz
+      btnQuiz.addEventListener('click', openQuiz);
+      quizClose.addEventListener('click', ()=> modalQuiz.style.display='none');
+      quizSubmit.addEventListener('click', submitQuiz);
+    }
+
+    // --- modal functions ---
+    function openModal(){
+      modal.style.display='flex';
+      inputName.value = currentUser || '';
+      inputName.focus();
+    }
+    function closeModal(){ modal.style.display='none' }
+
+    // --- escape html to avoid injection in prototype ---
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // --- quiz demo ---
+    const QUIZ = [
+      { q:'1) Fungsi turunan dari f(x)=x^2 adalah...', a:['2x','x','x^2','1'], correct:0 },
+      { q:'2) Unsur terkecil yang membentuk zat adalah...', a:['Atom','Molekul','Sel','Ion'], correct:0 },
+      { q:'3) Kalimat bahasa Inggris "Saya sedang belajar" = ?', a:['I learn','I am learning','I am learn','I learning'], correct:1 }
+    ];
+    function openQuiz(){
+      modalQuiz.style.display='flex';
+      renderQuiz();
+    }
+    function renderQuiz(){
+      quizContent.innerHTML = '';
+      QUIZ.forEach((it, idx)=>{
+        const div = document.createElement('div');
+        div.style.marginBottom='10px';
+        div.innerHTML = `<div style="font-weight:700">${it.q}</div>`;
+        it.a.forEach((opt, i)=>{
+          div.innerHTML += `<div style="margin-top:6px"><label><input type="radio" name="q${idx}" value="${i}"> ${opt}</label></div>`;
+        });
+        quizContent.appendChild(div);
+      });
+      quizResult.textContent = '';
+    }
+    function submitQuiz(){
+      let score = 0;
+      QUIZ.forEach((it, idx)=>{
+        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+        if(sel && Number(sel.value) === it.correct) score++;
+      });
+      quizResult.textContent = `Skor: ${score} / ${QUIZ.length}`;
+    }
+
+    // init app
+    init();
+
+    // expose for debugging (optional)
+    window.__studypal = { groups, saveData, loadData };
+  </script>
+<footer style="background-color:#0d47a1;color:white;text-align:center;padding:20px 10px;margin-top:40px;">
+  <h3>StudyPal Official</h3>
+  <p>📍 Jl. Pendidikan No. 45, Jakarta | 📧 support@studypal.id</p>
+  <div style="margin-top:10px;">
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">Instagram</a> |
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">YouTube</a> |
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">TikTok</a>
+  </div>
+  <p style="font-size:13px;color:#cfe2f5;margin-top:10px;">© 2025 StudyPal • Semua Hak Dilindungi</p>
+</footer>
+</body>
+</html>
