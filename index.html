@@ -159,6 +159,162 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
+
+  // Fungsi untuk membuat grup baru
+async function createGroupInDB(name, subject) {
+  try {
+    const docRef = await addDoc(collection(db, "groups"), {
+      name: name,
+      subject: subject,
+      createdAt: new Date(),
+      members: []
+    });
+    console.log("Group created with ID: ", docRef.id);
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding group: ", e);
+    return null;
+  }
+}
+
+// Fungsi untuk mendapatkan semua grup
+async function getAllGroups() {
+  try {
+    const groupsCollection = collection(db, "groups");
+    const groupsSnapshot = await getDocs(groupsCollection);
+    const groupsList = groupsSnapshot.docs.map(doc => {
+      return { id: doc.id, ...doc.data() };
+    });
+    return groupsList;
+  } catch (e) {
+    console.error("Error getting groups: ", e);
+    return [];
+  }
+}
+
+// Fungsi untuk bergabung dengan grup
+async function joinGroup(groupId, userId) {
+  try {
+    const groupRef = doc(db, "groups", groupId);
+    const groupDoc = await getDoc(groupRef);
+    
+    if (groupDoc.exists()) {
+      const members = groupDoc.data().members || [];
+      if (!members.includes(userId)) {
+        members.push(userId);
+        await updateDoc(groupRef, { members: members });
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.error("Error joining group: ", e);
+    return false;
+  }
+}
+
+// Fungsi untuk membuat postingan baru
+async function createPost(groupId, author, content, title) {
+  try {
+    const postsCollection = collection(db, "groups", groupId, "posts");
+    const docRef = await addDoc(postsCollection, {
+      author: author,
+      content: content,
+      title: title || "",
+      createdAt: new Date(),
+      upvotes: 0,
+      replies: []
+    });
+    console.log("Post created with ID: ", docRef.id);
+    return docRef.id;
+  } catch (e) {
+    console.error("Error adding post: ", e);
+    return null;
+  }
+}
+
+// Fungsi untuk mendapatkan postingan dalam grup
+async function getPosts(groupId) {
+  try {
+    const postsCollection = collection(db, "groups", groupId, "posts");
+    const q = query(postsCollection, orderBy("createdAt", "desc"));
+    const postsSnapshot = await getDocs(q);
+    const postsList = postsSnapshot.docs.map(doc => {
+      return { id: doc.id, ...doc.data() };
+    });
+    return postsList;
+  } catch (e) {
+    console.error("Error getting posts: ", e);
+    return [];
+  }
+}
+
+// Fungsi untuk menambahkan balasan
+async function addReply(groupId, postId, author, text) {
+  try {
+    const postRef = doc(db, "groups", groupId, "posts", postId);
+    const postDoc = await getDoc(postRef);
+    
+    if (postDoc.exists()) {
+      const replies = postDoc.data().replies || [];
+      replies.push({
+        id: genId(),
+        author: author,
+        text: text,
+        createdAt: new Date()
+      });
+      await updateDoc(postRef, { replies: replies });
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error("Error adding reply: ", e);
+    return false;
+  }
+}
+
+// Fungsi untuk upvote postingan
+async function upvotePost(groupId, postId) {
+  try {
+    const postRef = doc(db, "groups", groupId, "posts", postId);
+    const postDoc = await getDoc(postRef);
+    
+    if (postDoc.exists()) {
+      const upvotes = postDoc.data().upvotes || 0;
+      await updateDoc(postRef, { upvotes: upvotes + 1 });
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error("Error upvoting post: ", e);
+    return false;
+  }
+}
+
+// Fungsi untuk login anonim
+async function anonymousLogin() {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    return userCredential.user;
+  } catch (e) {
+    console.error("Error signing in anonymously: ", e);
+    return null;
+  }
+}
+
+// Fungsi untuk memantau perubahan postingan secara real-time
+function listenToPosts(groupId, callback) {
+  const postsCollection = collection(db, "groups", groupId, "posts");
+  const q = query(postsCollection, orderBy("createdAt", "desc"));
+  
+  return onSnapshot(q, (querySnapshot) => {
+    const postsList = [];
+    querySnapshot.forEach((doc) => {
+      postsList.push({ id: doc.id, ...doc.data() });
+    });
+    callback(postsList);
+  });
+}
 </script>
 </head>
 <body>
@@ -690,3 +846,4 @@
 </footer>
 </body>
 </html>
+
