@@ -22,6 +22,7 @@
       --leaderboard-gold: #FFD700;
       --leaderboard-silver: #C0C0C0;
       --leaderboard-bronze: #CD7F32;
+      --development: #ff9800; /* Orange for development notice */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -80,70 +81,40 @@
     .user-chip{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(11,111,182,0.06);color:var(--primary);font-weight:600;cursor:pointer;position:relative}
     .notification-badge{position:absolute;top:-5px;right:-5px;background:var(--notification);color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold}
     .small{font-size:13px;color:var(--muted)}
-    .current-level-indicator {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      color: white;
-    }
-    .level-sma { background: var(--sma-color); }
 
-    /* ===== Level Selection View ===== */
-    #levelSelectionView {
-      padding: 40px 0;
+    /* Development Notice */
+    .development-notice {
+      background: linear-gradient(135deg, var(--development), #ffb74d);
+      color: white;
+      padding: 12px 20px;
       text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+      position: relative;
+      overflow: hidden;
     }
-    .level-selection-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 20px;
+    .development-notice::before {
+      content: '🚧';
+      margin-right: 8px;
+      font-size: 16px;
     }
-    .level-selection-title {
-      font-size: 32px;
-      margin-bottom: 10px;
+    .development-notice::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 3s infinite;
     }
-    .level-selection-subtitle {
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: 40px;
-    }
-    .level-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-      justify-content: center;
-    }
-    .level-card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      border: 2px solid transparent;
-    }
-    .level-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(11,111,182,0.15);
-    }
-    .level-card.sma { border-color: var(--sma-color); }
-    .level-icon {
-      font-size: 48px;
-      margin-bottom: 15px;
-    }
-    .level-card.sma .level-icon { color: var(--sma-color); }
-    .level-card h3 {
-      margin: 0 0 5px 0;
-      font-size: 24px;
-    }
-    .level-card p {
-      margin: 0;
-      color: var(--muted);
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
     }
 
     /* ===== Dashboard View ===== */
-    #dashboardView { display: none; }
     .container{max-width:1100px;margin:28px auto;padding:0 18px}
     .hero{
       display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:center;
@@ -397,12 +368,47 @@
       color: var(--muted);
     }
 
+    /* Feature Badge */
+    .feature-badge {
+      display: inline-block;
+      background: var(--development);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
     /* footer */
     footer{display:flex;justify-content:center;padding:18px;margin-top:30px;color:var(--muted)}
 
     /* modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(6,20,36,0.36);display:none;align-items:center;justify-content:center;z-index:90}
-    .modal{background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:640px;box-shadow:0 16px 40px rgba(6,20,36,0.18)}
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(6,20,36,0.36);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:90;
+    }
+    .modal-backdrop.force-show {
+      display: flex !important;
+    }
+    .modal{
+      background:var(--card);
+      padding:18px;
+      border-radius:12px;
+      min-width:320px;
+      max-width:640px;
+      box-shadow:0 16px 40px rgba(6,20,36,0.18)
+    }
     .modal.show{display:flex}
 
     /* responsive */
@@ -411,7 +417,6 @@
       .layout{grid-template-columns:1fr;align-items:start}
       .sidebar{position:static}
       .profile-content{grid-template-columns:1fr}
-      .level-cards { grid-template-columns: 1fr; }
     }
   </style>
 <script type="module">
@@ -707,6 +712,11 @@
 </script>
 </head>
 <body>
+  <!-- Development Notice Banner -->
+  <div class="development-notice">
+    🚧 StudyPal masih dalam tahap pengembangan - Fitur dapat berubah sewaktu-waktu
+  </div>
+
   <header>
     <div class="brand">
     <div class="logo" style="background:none;box-shadow:none;padding:0;">
@@ -734,21 +744,6 @@
   </header>
 
   <main class="container" id="app">
-    <!-- Level Selection View -->
-    <div id="levelSelectionView">
-      <div class="level-selection-container">
-        <h1 class="level-selection-title">Selamat Datang di StudyPal!</h1>
-        <p class="level-selection-subtitle">Platform belajar kolaboratif untuk siswa SMA</p>
-        <div class="level-cards">
-          <div class="level-card sma" data-level="sma">
-            <div class="level-icon">🎓</div>
-            <h3>SMA</h3>
-            <p>Sekolah Menengah Atas</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Dashboard View -->
     <div id="dashboardView">
       <!-- Hero -->
@@ -793,7 +788,7 @@
       <!-- Main layout: sidebar groups + forum -->
       <section id="mainArea" style="display:none" class="layout">
         <div class="sidebar card">
-          <h3 style="margin:0 0 8px 0">Grup Study</h3>
+          <h3 style="margin:0 0 8px 0">Grup Study <span class="feature-badge">Beta</span></h3>
           <div class="small">Pilih grup atau buat yang baru</div>
           <div id="groupList" class="group-list" style="margin-top:12px"></div>
 
@@ -855,7 +850,7 @@
     <div id="profileView" class="profile-view">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <h2>Profil Saya</h2>
+          <h2>Profil Saya <span class="feature-badge">Beta</span></h2>
           <button class="btn secondary" id="btnBackToDashboard">← Kembali ke Dashboard</button>
         </div>
         
@@ -926,6 +921,10 @@
     <div class="modal">
       <h3 id="modalTitle">Login / Register</h3>
       <p class="small" id="modalDesc">Masukkan nama pengguna untuk mulai menggunakan StudyPal</p>
+      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:12px;margin:16px 0">
+        <div style="font-weight:600;color:#856404;font-size:13px">⚠️ Perhatian</div>
+        <div style="color:#856404;font-size:12px;margin-top:4px">StudyPal masih dalam tahap pengembangan. Data yang Anda masukkan mungkin tidak tersimpan secara permanen.</div>
+      </div>
       <input id="inputName" class="input" placeholder="Nama lengkap atau nama panggilan"/>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
         <button class="btn secondary" id="modalCancel">Batal</button>
@@ -937,8 +936,13 @@
   <!-- Modal: Create Group -->
   <div id="modalCreateGroup" class="modal-backdrop">
     <div class="modal">
-      <h3>Buat Grup Baru</h3>
+      <h3>Buat Grup Baru <span class="feature-badge">Beta</span></h3>
       <p class="small">Buat grup belajar untukmu dan teman-temanmu</p>
+      
+      <div style="background:#e3f2fd;border:1px solid #bbdefb;border-radius:8px;padding:12px;margin:16px 0">
+        <div style="font-weight:600;color:#1565c0;font-size:13px">💡 Fitur Beta</div>
+        <div style="color:#1565c0;font-size:12px;margin-top:4px">Grup yang Anda buat akan tersimpan di browser ini. Fitur sinkronasi akan segera hadir.</div>
+      </div>
       
       <div style="margin-top:16px">
         <label class="small">Nama Grup *</label>
@@ -967,7 +971,7 @@
   <!-- Modal: Quiz -->
   <div id="modalQuiz" class="modal-backdrop">
     <div class="modal" style="max-width:520px">
-      <h3>Kuis Cepat</h3>
+      <h3>Kuis Cepat <span class="feature-badge">Beta</span></h3>
       <p class="small">Pilih kategori dan jawab soal untuk menguji pemahamanmu.</p>
       
       <!-- Quiz categories -->
@@ -992,7 +996,7 @@
   <div id="leaderboardModal" class="modal-backdrop">
     <div class="modal">
       <div class="leaderboard-header">
-        <h3>🏆 Papan Peringkat</h3>
+        <h3>🏆 Papan Peringkat <span class="feature-badge">Beta</span></h3>
         <button class="btn secondary" id="leaderboardClose">Tutup</button>
       </div>
       <div class="leaderboard-tabs">
@@ -1006,9 +1010,11 @@
 
   <script>
     /***************
-     * StudyPal SMA Only Version
-     * - Removed SMP level
-     * - Added Leaderboard with tabs for different levels
+     * StudyPal SMA Only Version - Fixed Login Modal for New Users
+     * - Removed level selection screen
+     * - Direct to main dashboard
+     * - Added development notices and beta badges
+     * - Fixed button functionality for new users
      * - Enhanced quiz to show correct/incorrect answers
      * - Data, subjects, and quizzes are level-specific
      * - Added dedicated profile view and enhanced group creation
@@ -1109,7 +1115,9 @@
         currentUser = JSON.parse(savedUser);
         showDashboard();
       } else {
-        showLevelSelection();
+        showDashboard();
+        // Langsung tampilkan modal login untuk user baru
+        showLoginModal();
       }
 
       // Setup event listeners
@@ -1118,28 +1126,51 @@
 
     // --- Event Listeners ---
     function setupEventListeners() {
-      // Level selection
-      document.querySelector('.level-card').addEventListener('click', () => {
-        showLoginModal();
-      });
-
       // Header buttons
       document.getElementById('btn-login').addEventListener('click', showLoginModal);
-      document.getElementById('btn-profile').addEventListener('click', showProfile);
-      document.getElementById('btn-leaderboard').addEventListener('click', showLeaderboard);
-      document.getElementById('btn-quiz').addEventListener('click', showQuiz);
+      document.getElementById('btn-profile').addEventListener('click', () => {
+        if (!currentUser) {
+          showLoginModal();
+        } else {
+          showProfile();
+        }
+      });
+      document.getElementById('btn-leaderboard').addEventListener('click', () => {
+        if (!currentUser) {
+          showLoginModal();
+        } else {
+          showLeaderboard();
+        }
+      });
+      document.getElementById('btn-quiz').addEventListener('click', () => {
+        if (!currentUser) {
+          showLoginModal();
+        } else {
+          showQuiz();
+        }
+      });
 
       // Dashboard buttons
       document.getElementById('startBtn').addEventListener('click', () => {
-        document.getElementById('mainArea').style.display = 'grid';
-        renderGroups();
+        if (!currentUser) {
+          showLoginModal();
+        } else {
+          document.getElementById('mainArea').style.display = 'grid';
+          renderGroups();
+        }
       });
       document.getElementById('learnMore').addEventListener('click', () => {
-        alert('Fitur-fitur StudyPal:\n\n1. Forum Diskusi - Tanya jawab & solusi soal antar siswa\n2. Grup Belajar - Buat grup sesuai kelas atau topik\n3. Kuis Interaktif - Latihan singkat untuk memperkuat pemahaman\n4. Leaderboard - Lihat peringkatmu dan bersaing dengan teman\n5. Profil Personal - Kelola informasi dan lihat statistik belajarmu');
+        alert('Fitur-fitur StudyPal:\n\n1. Forum Diskusi - Tanya jawab & solusi soal antar siswa\n2. Grup Belajar - Buat grup sesuai kelas atau topik\n3. Kuis Interaktif - Latihan singkat untuk memperkuat pemahaman\n4. Leaderboard - Lihat peringkatmu dan bersaing dengan teman\n5. Profil Personal - Kelola informasi dan lihat statistik belajarmu\n\n⚠️ Fitur masih dalam tahap pengembangan (Beta)');
       });
 
       // Group management
-      document.getElementById('btnCreateGroup').addEventListener('click', showCreateGroupModal);
+      document.getElementById('btnCreateGroup').addEventListener('click', () => {
+        if (!currentUser) {
+          showLoginModal();
+        } else {
+          showCreateGroupModal();
+        }
+      });
       document.getElementById('btnJoin').addEventListener('click', joinCurrentGroup);
       document.getElementById('btnLeave').addEventListener('click', leaveCurrentGroup);
 
@@ -1181,24 +1212,23 @@
     }
 
     // --- View Management ---
-    function showLevelSelection() {
-      document.getElementById('levelSelectionView').style.display = 'block';
-      document.getElementById('dashboardView').style.display = 'none';
-      document.getElementById('profileView').style.display = 'none';
-    }
-
     function showDashboard() {
-      document.getElementById('levelSelectionView').style.display = 'none';
       document.getElementById('dashboardView').style.display = 'block';
       document.getElementById('profileView').style.display = 'none';
       
       // Update header
-      document.getElementById('btn-login').style.display = 'none';
-      document.getElementById('btn-profile').style.display = 'block';
-      document.getElementById('userArea').style.display = 'flex';
-      
-      // Update user area
-      document.getElementById('avatarInitial').textContent = currentUser.name.charAt(0).toUpperCase();
+      if (currentUser) {
+        document.getElementById('btn-login').style.display = 'none';
+        document.getElementById('btn-profile').style.display = 'block';
+        document.getElementById('userArea').style.display = 'flex';
+        
+        // Update user area
+        document.getElementById('avatarInitial').textContent = currentUser.name.charAt(0).toUpperCase();
+      } else {
+        document.getElementById('btn-login').style.display = 'block';
+        document.getElementById('btn-profile').style.display = 'none';
+        document.getElementById('userArea').style.display = 'none';
+      }
       
       // Render subject quick access
       renderSubjectQuick();
@@ -1216,13 +1246,22 @@
     }
 
     function showLoginModal() {
-      document.getElementById('modal').style.display = 'flex';
+      const modal = document.getElementById('modal');
+      modal.style.display = 'flex';
+      modal.classList.add('force-show');
       document.getElementById('modalTitle').textContent = 'Masuk ke StudyPal';
       document.getElementById('modalDesc').textContent = 'Masukkan nama pengguna untuk mulai menggunakan StudyPal';
+      
+      // Focus pada input field
+      setTimeout(() => {
+        document.getElementById('inputName').focus();
+      }, 100);
     }
 
     function hideModal() {
-      document.getElementById('modal').style.display = 'none';
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+      modal.classList.remove('force-show');
     }
 
     function showCreateGroupModal() {
@@ -1285,7 +1324,7 @@
       const name = document.getElementById('groupNameInput').value.trim();
       const subject = document.getElementById('groupSubjectInput').value;
       
-      if (name && subject) {
+      if (name && subject && currentUser) {
         const newGroup = {
           id: genId(),
           name: name,
@@ -1305,7 +1344,7 @@
 
     function createPost() {
       const content = document.getElementById('postText').value.trim();
-      if (content && currentGroup) {
+      if (content && currentGroup && currentUser) {
         const newPost = {
           id: genId(),
           author: currentUser.name,
@@ -1335,7 +1374,7 @@
     }
 
     function joinCurrentGroup() {
-      if (currentGroup && !currentGroup.members.includes(currentUser.id)) {
+      if (currentGroup && currentUser && !currentGroup.members.includes(currentUser.id)) {
         currentGroup.members.push(currentUser.id);
         saveData(groups);
         renderGroups();
@@ -1344,7 +1383,7 @@
     }
 
     function leaveCurrentGroup() {
-      if (currentGroup) {
+      if (currentGroup && currentUser) {
         currentGroup.members = currentGroup.members.filter(id => id !== currentUser.id);
         saveData(groups);
         currentGroup = null;
@@ -1354,6 +1393,8 @@
     }
 
     function saveProfile() {
+      if (!currentUser) return;
+      
       const email = document.getElementById('profileEmailInput').value.trim();
       const bio = document.getElementById('profileBioInput').value.trim();
       
@@ -1383,6 +1424,10 @@
       // Add click handlers
       container.querySelectorAll('.subject').forEach(subjectEl => {
         subjectEl.addEventListener('click', () => {
+          if (!currentUser) {
+            showLoginModal();
+            return;
+          }
           const subjectName = subjectEl.dataset.subject;
           document.getElementById('mainArea').style.display = 'grid';
           renderGroups(subjectName);
@@ -1407,6 +1452,10 @@
       // Add click handlers
       container.querySelectorAll('.group-item').forEach(groupEl => {
         groupEl.addEventListener('click', () => {
+          if (!currentUser) {
+            showLoginModal();
+            return;
+          }
           const groupId = groupEl.dataset.groupId;
           currentGroup = groups.find(g => g.id === groupId);
           renderGroups();
@@ -1416,7 +1465,7 @@
     }
 
     function renderForum() {
-      if (!currentGroup) return;
+      if (!currentGroup || !currentUser) return;
       
       document.getElementById('groupHeader').style.display = 'none';
       document.getElementById('forumArea').style.display = 'block';
@@ -1468,6 +1517,8 @@
     }
 
     function renderProfile() {
+      if (!currentUser) return;
+      
       document.getElementById('profileName').textContent = currentUser.name;
       document.getElementById('profileEmail').textContent = currentUser.email || 'Belum ada email';
       document.getElementById('profileBio').textContent = currentUser.bio || 'Belum ada bio';
@@ -1546,6 +1597,8 @@
     }
 
     function submitQuiz() {
+      if (!currentUser) return;
+      
       let score = 0;
       quizState.questions.forEach((q, i) => {
         if (quizState.answers[i] === q.correct) score++;
@@ -1662,7 +1715,7 @@
 
     // --- Helper functions ---
     window.upvotePost = function(postId) {
-      if (currentGroup) {
+      if (currentGroup && currentUser) {
         const post = currentGroup.posts.find(p => p.id === postId);
         if (post) {
           post.upvotes++;
@@ -1673,6 +1726,11 @@
     };
 
     window.showReplyInput = function(postId) {
+      if (!currentUser) {
+        showLoginModal();
+        return;
+      }
+      
       const replyText = prompt('Tulis balasan:');
       if (replyText && currentGroup) {
         const post = currentGroup.posts.find(p => p.id === postId);
