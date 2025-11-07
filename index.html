@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StudyPal — Platform Belajar Kolaboratif</title>
+  <title>StudyPal — Platform Belajar Kolaboratif (Prototype)</title>
   <style>
     /* ===== Global styles ===== */
     :root{
@@ -17,12 +17,6 @@
       --radius:12px;
       --shadow: 0 6px 18px rgba(11,111,182,0.08);
       --mono: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      --notification: #ff5252;
-      --sma-color: #2196F3; /* Blue */
-      --leaderboard-gold: #FFD700;
-      --leaderboard-silver: #C0C0C0;
-      --leaderboard-bronze: #CD7F32;
-      --development: #ff9800; /* Orange for development notice */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -72,49 +66,28 @@
       background:transparent;color:var(--primary);border:1px solid rgba(11,111,182,0.12);
       box-shadow:none;font-weight:600;
     }
-    .btn.leaderboard {
-      background: linear-gradient(135deg, var(--leaderboard-gold), #ffed4e);
-      color: #333;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-    }
-    .user-chip{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(11,111,182,0.06);color:var(--primary);font-weight:600;cursor:pointer;position:relative}
-    .notification-badge{position:absolute;top:-5px;right:-5px;background:var(--notification);color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold}
+    .user-chip{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(11,111,182,0.06);color:var(--primary);font-weight:600}
     .small{font-size:13px;color:var(--muted)}
-
-    /* Development Notice */
-    .development-notice {
-      background: linear-gradient(135deg, var(--development), #ffb74d);
+    .jenjang-selector {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .jenjang-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #e6eef8;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .jenjang-btn.active {
+      background: var(--primary);
       color: white;
-      padding: 12px 20px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-    .development-notice::before {
-      content: '🚧';
-      margin-right: 8px;
-      font-size: 16px;
-    }
-    .development-notice::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      animation: shimmer 3s infinite;
-    }
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
+      border-color: var(--primary);
     }
 
-    /* ===== Dashboard View ===== */
+    /* ===== Hero ===== */
     .container{max-width:1100px;margin:28px auto;padding:0 18px}
     .hero{
       display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:center;
@@ -125,6 +98,8 @@
     .hero h2{margin:0 0 6px;font-size:24px}
     .hero p{margin:0 0 16px;color:var(--muted)}
     .hero-actions{display:flex;gap:12px;align-items:center}
+
+    /* ===== Dashboard cards ===== */
     .grid{
       display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px;
     }
@@ -133,11 +108,6 @@
     }
     .subject{
       display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid #f1f6fb;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .subject:hover {
-      background-color: var(--accent);
     }
     .subject .icon{
       width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
@@ -146,13 +116,13 @@
     .s-phys{background:linear-gradient(135deg,#ff8a65,#ffb86b)}
     .s-bio{background:linear-gradient(135deg,#4caf50,#8bdc91)}
     .s-eng{background:linear-gradient(135deg,#9c27b0,#c18ce8)}
-    .s-pai{background:linear-gradient(135deg,#4caf50,#8bc34a)}
-    .s-geo{background:linear-gradient(135deg,#795548,#a1887f)}
-    .s-info{background:linear-gradient(135deg,#607d8b,#90a4ae)}
-    .s-jawa{background:linear-gradient(135deg,#ff9800,#ffb74d)}
-    .s-indo{background:linear-gradient(135deg,#f44336,#e57373)}
-    .s-ipa{background:linear-gradient(135deg,#00bcd4,#4dd0e1)}
-    .s-ips{background:linear-gradient(135deg,#ffeb3b,#fff176)}
+    .s-indo{background:linear-gradient(135deg,#f44336,#ff6659)}
+    .s-ips{background:linear-gradient(135deg,#ff9800,#ffb74d)}
+    .s-kimia{background:linear-gradient(135deg,#00bcd4,#4dd0e1)}
+    .s-eko{background:linear-gradient(135deg,#795548,#a1887f)}
+    .s-geo{background:linear-gradient(135deg,#4caf50,#81c784)}
+    .s-sej{background:linear-gradient(135deg,#3f51b5,#5c6bc0)}
+    .s-sos{background:linear-gradient(135deg,#e91e63,#f06292)}
 
     /* ===== Group & forum view ===== */
     .layout{
@@ -166,557 +136,35 @@
     .group-item.active{border:2px solid var(--primary);box-shadow:0 8px 20px rgba(11,111,182,0.06)}
     .new-group{display:flex;gap:8px;margin-top:12px}
     .input{padding:10px;border-radius:10px;border:1px solid #e6eef8;flex:1}
-    .input.full-width{width:100%}
+    select.input { cursor: pointer; }
 
     /* forum */
     .forum{
       display:flex;flex-direction:column;gap:12px;
     }
     .post{
-      padding:12px;border-radius:10px;background:var(--card);border:1px solid #eef6fc;box-shadow:var(--shadow);
+      padding:12px;border-radius:10px;background:var(--card);border:1px solid #eef6fb;box-shadow:var(--shadow);
     }
     .post .meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
     .reply-list{margin-top:8px;display:flex;flex-direction:column;gap:8px;padding-left:8px}
-    
-    /* File sharing */
-    .file-attachment{margin-top:8px;padding:8px;background:#f8f9fa;border-radius:8px;display:flex;align-items:center;gap:8px}
-    .file-icon{width:32px;height:32px;background:#e3f2fd;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#1976d2}
-    .file-info{flex:1}
-    .file-name{font-weight:600;font-size:14px}
-    .file-size{font-size:12px;color:var(--muted)}
-    .file-actions{display:flex;gap:4px}
-    .file-actions button{padding:4px 8px;font-size:12px;border-radius:6px}
-    
-    /* Notification panel */
-    .notification-panel{position:absolute;top:60px;right:0;background:var(--card);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);width:320px;max-height:400px;overflow-y:auto;z-index:100;display:none}
-    .notification-header{padding:12px;border-bottom:1px solid #eef6fc;font-weight:700}
-    .notification-list{padding:8px}
-    .notification-item{padding:10px;border-radius:8px;margin-bottom:6px;background:#f8f9fa;cursor:pointer}
-    .notification-item.unread{background:#e3f2fd}
-    .notification-time{font-size:11px;color:var(--muted)}
-    
-    /* Profile View */
-    .profile-view{display:none}
-    .profile-header{display:flex;gap:20px;align-items:center;margin-bottom:24px}
-    .profile-avatar-large{width:100px;height:100px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--primary);font-weight:700}
-    .profile-info h2{margin:0 0 4px 0}
-    .profile-info .small{margin:0}
-    .profile-content{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .profile-section h3{margin:0 0 12px 0;font-size:18px}
-    .profile-stats{display:flex;gap:20px;margin-bottom:20px}
-    .profile-stat{text-align:center}
-    .profile-stat-value{font-size:24px;font-weight:700}
-    .profile-stat-label{font-size:13px;color:var(--muted)}
-    .profile-list{display:flex;flex-direction:column;gap:10px}
-    .profile-list-item{padding:12px;background:#f8f9fa;border-radius:8px;border:1px solid #eef6fc}
-    .profile-list-item-title{font-weight:600}
-    .profile-list-item-meta{font-size:12px;color:var(--muted)}
-    
-    /* Quiz categories */
-    .quiz-categories{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-    .quiz-category{padding:6px 12px;border-radius:20px;background:#e3f2fd;color:var(--primary);font-size:13px;cursor:pointer}
-    .quiz-category.active{background:var(--primary);color:white}
-    
-    /* Leaderboard Modal */
-    #leaderboardModal .modal {
-      max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .leaderboard-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .leaderboard-header h3 {
-      margin: 0;
-      color: var(--primary);
-    }
-    .leaderboard-header .btn.secondary {
-      font-size: 13px;
-    }
-    .leaderboard-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #eef6fc;
-    }
-    .leaderboard-tab {
-      padding: 8px 16px;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      font-weight: 600;
-      color: var(--muted);
-      transition: all 0.2s ease;
-    }
-    .leaderboard-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-    .leaderboard-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      background: var(--card);
-      border-radius: var(--radius);
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease;
-    }
-    .leaderboard-item:hover {
-      transform: translateY(-2px);
-    }
-    .leaderboard-rank {
-      font-size: 20px;
-      font-weight: 700;
-      width: 40px;
-      text-align: center;
-    }
-    .rank-1 { color: var(--leaderboard-gold); }
-    .rank-2 { color: var(--leaderboard-silver); }
-    .rank-3 { color: var(--leaderboard-bronze); }
-    .leaderboard-rank .rank-medal {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: white;
-    }
-    .rank-1 .rank-medal { background: var(--leaderboard-gold); }
-    .rank-2 .rank-medal { background: var(--leaderboard-silver); }
-    .rank-3 .rank-medal { background: var(--leaderboard-bronze); }
-    .leaderboard-info {
-      flex-grow: 1;
-      margin-left: 16px;
-    }
-    .leaderboard-name {
-      font-weight: 600;
-      font-size: 16px;
-    }
-    .leaderboard-meta {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .leaderboard-score {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--primary);
-    }
-    .empty-leaderboard {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
-    .empty-leaderboard-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    /* Quiz Result Styles */
-    .quiz-result-details {
-      margin-top: 16px;
-      padding: 12px;
-      background-color: #f8f9fa;
-      border-radius: var(--radius);
-      border: 1px solid #eef6fc;
-    }
-    .quiz-result-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .quiz-result-item:last-child {
-      margin-bottom: 0;
-    }
-    .quiz-result-icon {
-      font-size: 20px;
-    }
-    .correct { color: #4caf50; }
-    .incorrect { color: #f44336; }
-    .quiz-result-content {
-      flex-grow: 1;
-    }
-    .quiz-result-question {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .quiz-result-answer {
-      font-size: 14px;
-    }
-    .quiz-result-answer.correct {
-      color: #2e7d32;
-    }
-    .quiz-result-answer.incorrect {
-      color: #c62828;
-      text-decoration: line-through;
-    }
-    .quiz-result-feedback {
-      font-size: 13px;
-      font-style: italic;
-      color: var(--muted);
-    }
-
-    /* Feature Badge */
-    .feature-badge {
-      display: inline-block;
-      background: var(--development);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-left: 6px;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
 
     /* footer */
     footer{display:flex;justify-content:center;padding:18px;margin-top:30px;color:var(--muted)}
 
     /* modal */
-    .modal-backdrop{
-      position:fixed;
-      inset:0;
-      background:rgba(6,20,36,0.36);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:90;
-    }
-    .modal-backdrop.force-show {
-      display: flex !important;
-    }
-    .modal{
-      background:var(--card);
-      padding:18px;
-      border-radius:12px;
-      min-width:320px;
-      max-width:640px;
-      box-shadow:0 16px 40px rgba(6,20,36,0.18)
-    }
-    .modal.show{display:flex}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(6,20,36,0.36);display:none;align-items:center;justify-content:center;z-index:90}
+    .modal{background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:640px;box-shadow:0 16px 40px rgba(6,20,36,0.18)}
+    .modal.show{display:block}
 
     /* responsive */
     @media (max-width:880px){
       .hero{grid-template-columns:1fr;gap:14px}
       .layout{grid-template-columns:1fr;align-items:start}
       .sidebar{position:static}
-      .profile-content{grid-template-columns:1fr}
     }
   </style>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-  
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyC_38dL0qBf_3InAGxgQBKB1Gh3voCQMTU",
-    authDomain: "studypal-2c4da.firebaseapp.com",
-    projectId: "studypal-2c4da",
-    storageBucket: "studypal-2c4da.firebasestorage.app",
-    messagingSenderId: "263468645535",
-    appId: "1:263468645535:web:637152446b7ea24f5c36aa",
-    measurementId: "G-8BJF7N5EG2"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Fungsi untuk membuat grup baru
-  async function createGroupInDB(name, subject) {
-    try {
-      const docRef = await addDoc(collection(db, "groups"), {
-        name: name,
-        subject: subject,
-        createdAt: new Date(),
-        members: []
-      });
-      console.log("Group created with ID: ", docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error("Error adding group: ", e);
-      return null;
-    }
-  }
-
-  // Fungsi untuk mendapatkan semua grup
-  async function getAllGroups() {
-    try {
-      const groupsCollection = collection(db, "groups");
-      const groupsSnapshot = await getDocs(groupsCollection);
-      const groupsList = groupsSnapshot.docs.map(doc => {
-        return { id: doc.id, ...doc.data() };
-      });
-      return groupsList;
-    } catch (e) {
-      console.error("Error getting groups: ", e);
-      return [];
-    }
-  }
-
-  // Fungsi untuk bergabung dengan grup
-  async function joinGroup(groupId, userId) {
-    try {
-      const groupRef = doc(db, "groups", groupId);
-      const groupDoc = await getDoc(groupRef);
-      
-      if (groupDoc.exists()) {
-        const members = groupDoc.data().members || [];
-        if (!members.includes(userId)) {
-          members.push(userId);
-          await updateDoc(groupRef, { members: members });
-          return true;
-        }
-      }
-      return false;
-    } catch (e) {
-      console.error("Error joining group: ", e);
-      return false;
-    }
-  }
-
-  // Fungsi untuk membuat postingan baru
-  async function createPost(groupId, author, content, title, attachments) {
-    try {
-      const postsCollection = collection(db, "groups", groupId, "posts");
-      const docRef = await addDoc(postsCollection, {
-        author: author,
-        content: content,
-        title: title || "",
-        attachments: attachments || [],
-        createdAt: new Date(),
-        upvotes: 0,
-        replies: []
-      });
-      console.log("Post created with ID: ", docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error("Error adding post: ", e);
-      return null;
-    }
-  }
-
-  // Fungsi untuk mendapatkan postingan dalam grup
-  async function getPosts(groupId) {
-    try {
-      const postsCollection = collection(db, "groups", groupId, "posts");
-      const q = query(postsCollection, orderBy("createdAt", "desc"));
-      const postsSnapshot = await getDocs(q);
-      const postsList = postsSnapshot.docs.map(doc => {
-        return { id: doc.id, ...doc.data() };
-      });
-      return postsList;
-    } catch (e) {
-      console.error("Error getting posts: ", e);
-      return [];
-    }
-  }
-
-  // Fungsi untuk menambahkan balasan
-  async function addReply(groupId, postId, author, text) {
-    try {
-      const postRef = doc(db, "groups", groupId, "posts", postId);
-      const postDoc = await getDoc(postRef);
-      
-      if (postDoc.exists()) {
-        const replies = postDoc.data().replies || [];
-        replies.push({
-          id: genId(),
-          author: author,
-          text: text,
-          createdAt: new Date()
-        });
-        await updateDoc(postRef, { replies: replies });
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error("Error adding reply: ", e);
-      return false;
-    }
-  }
-
-  // Fungsi untuk upvote postingan
-  async function upvotePost(groupId, postId) {
-    try {
-      const postRef = doc(db, "groups", groupId, "posts", postId);
-      const postDoc = await getDoc(postRef);
-      
-      if (postDoc.exists()) {
-        const upvotes = postDoc.data().upvotes || 0;
-        await updateDoc(postRef, { upvotes: upvotes + 1 });
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error("Error upvoting post: ", e);
-      return false;
-    }
-  }
-
-  // Fungsi untuk login anonim
-  async function anonymousLogin() {
-    try {
-      const userCredential = await signInAnonymously(auth);
-      return userCredential.user;
-    } catch (e) {
-      console.error("Error signing in anonymously: ", e);
-      return null;
-    }
-  }
-
-  // Fungsi untuk memantau perubahan postingan secara real-time
-  function listenToPosts(groupId, callback) {
-    const postsCollection = collection(db, "groups", groupId, "posts");
-    const q = query(postsCollection, orderBy("createdAt", "desc"));
-    
-    return onSnapshot(q, (querySnapshot) => {
-      const postsList = [];
-      querySnapshot.forEach((doc) => {
-        postsList.push({ id: doc.id, ...doc.data() });
-      });
-      callback(postsList);
-    });
-  }
-
-  // Fungsi untuk membuat notifikasi
-  async function createNotification(userId, type, message, relatedId) {
-    try {
-      const notificationsCollection = collection(db, "users", userId, "notifications");
-      const docRef = await addDoc(notificationsCollection, {
-        type: type, // 'post', 'reply', 'quiz', etc.
-        message: message,
-        relatedId: relatedId, // ID of related item (post, quiz, etc.)
-        read: false,
-        createdAt: new Date()
-      });
-      console.log("Notification created with ID: ", docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error("Error creating notification: ", e);
-      return null;
-    }
-  }
-
-  // Fungsi untuk mendapatkan notifikasi pengguna
-  async function getUserNotifications(userId) {
-    try {
-      const notificationsCollection = collection(db, "users", userId, "notifications");
-      const q = query(notificationsCollection, orderBy("createdAt", "desc"));
-      const notificationsSnapshot = await getDocs(q);
-      const notificationsList = notificationsSnapshot.docs.map(doc => {
-        return { id: doc.id, ...doc.data() };
-      });
-      return notificationsList;
-    } catch (e) {
-      console.error("Error getting notifications: ", e);
-      return [];
-    }
-  }
-
-  // Fungsi untuk menandai notifikasi sebagai dibaca
-  async function markNotificationAsRead(userId, notificationId) {
-    try {
-      const notificationRef = doc(db, "users", userId, "notifications", notificationId);
-      await updateDoc(notificationRef, { read: true });
-      return true;
-    } catch (e) {
-      console.error("Error marking notification as read: ", e);
-      return false;
-    }
-  }
-
-  // Fungsi untuk menyimpan skor kuis
-  async function saveQuizScore(userId, category, score, totalQuestions) {
-    try {
-      const scoresCollection = collection(db, "users", userId, "quizScores");
-      const docRef = await addDoc(scoresCollection, {
-        category: category,
-        score: score,
-        totalQuestions: totalQuestions,
-        percentage: Math.round((score / totalQuestions) * 100),
-        createdAt: new Date()
-      });
-      console.log("Quiz score saved with ID: ", docRef.id);
-      return docRef.id;
-    } catch (e) {
-      console.error("Error saving quiz score: ", e);
-      return null;
-    }
-  }
-
-  // Fungsi untuk mendapatkan skor kuis pengguna
-  async function getUserQuizScores(userId) {
-    try {
-      const scoresCollection = collection(db, "users", userId, "quizScores");
-      const q = query(scoresCollection, orderBy("createdAt", "desc"));
-      const scoresSnapshot = await getDocs(q);
-      const scoresList = scoresSnapshot.docs.map(doc => {
-        return { id: doc.id, ...doc.data() };
-      });
-      return scoresList;
-    } catch (e) {
-      console.error("Error getting quiz scores: ", e);
-      return [];
-    }
-  }
-
-  // Fungsi untuk memperbarui profil pengguna
-  async function updateUserProfile(userId, profileData) {
-    try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, profileData);
-      return true;
-    } catch (e) {
-      console.error("Error updating user profile: ", e);
-      return false;
-    }
-  }
-
-  // Fungsi untuk mendapatkan profil pengguna
-  async function getUserProfile(userId) {
-    try {
-      const userRef = doc(db, "users", userId);
-      const userDoc = await getDoc(userRef);
-      
-      if (userDoc.exists()) {
-        return userDoc.data();
-      }
-      return null;
-    } catch (e) {
-      console.error("Error getting user profile: ", e);
-      return null;
-    }
-  }
-</script>
 </head>
 <body>
-  <!-- Development Notice Banner -->
-  <div class="development-notice">
-    🚧 StudyPal masih dalam tahap pengembangan - Fitur dapat berubah sewaktu-waktu
-  </div>
-
   <header>
     <div class="brand">
     <div class="logo" style="background:none;box-shadow:none;padding:0;">
@@ -725,194 +173,122 @@
 
       <div>
         <h1>StudyPal</h1>
-        <div class="small">Platform belajar kolaboratif untuk SMA</div>
+        <div class="small">Belajar kolaboratif untuk semua jenjang</div>
       </div>
     </div>
     <nav>
-      <button class="btn leaderboard" id="btn-leaderboard">🏆 Papan Peringkat</button>
       <button class="btn" id="btn-quiz">Kuis Cepat</button>
       <button class="btn secondary" id="btn-login">Login / Register</button>
-      <button class="btn secondary" id="btn-profile" style="display:none">Profil</button>
-      <div id="userArea" style="display:none" class="user-chip">
-        <span id="notificationBadge" class="notification-badge" style="display:none">0</span>
-      </div>
-      <div id="notificationPanel" class="notification-panel">
-        <div class="notification-header">Notifikasi</div>
-        <div id="notificationList" class="notification-list"></div>
-      </div>
+      <div id="userArea" style="display:none" class="user-chip"></div>
     </nav>
   </header>
 
   <main class="container" id="app">
-    <!-- Dashboard View -->
-    <div id="dashboardView">
-      <!-- Hero -->
-      <section class="hero-card hero">
-        <div>
-          <h2>Belajar lebih mudah bersama teman — kapan saja, di mana saja</h2>
-          <p>StudyPal membantu siswa SMA membentuk grup belajar, berdiskusi, dan latihan soal interaktif. Cocok untuk tugas kelompok & persiapan ujian.</p>
-          <div class="hero-actions">
-            <button class="btn" id="startBtn">Mulai Belajar Sekarang</button>
-            <button class="btn secondary" id="learnMore">Lihat Fitur</button>
-          </div>
-
-          <!-- Highlights -->
-          <div class="grid" style="margin-top:18px">
-            <div class="card">
-              <strong>Forum Diskusi</strong>
-              <div class="small" style="margin-top:6px">Tanya jawab & solusi soal antar siswa.</div>
-            </div>
-            <div class="card">
-              <strong>Grup Belajar</strong>
-              <div class="small" style="margin-top:6px">Buat grup sesuai kelas atau topik.</div>
-            </div>
-            <div class="card">
-              <strong>Kuis Interaktif</strong>
-              <div class="small" style="margin-top:6px">Latihan singkat untuk memperkuat pemahaman.</div>
-            </div>
-            <div class="card">
-              <strong>Leaderboard</strong>
-              <div class="small" style="margin-top:6px">Lihat peringkatmu dan bersaing dengan teman.</div>
-            </div>
-          </div>
+    <!-- Hero -->
+    <section class="hero-card hero">
+      <div>
+        <h2>Belajar lebih mudah bersama teman — kapan saja, di mana saja</h2>
+        <p>StudyPal membantu siswa dari SD hingga SMA membentuk grup belajar, berdiskusi, dan latihan soal interaktif. Cocok untuk tugas kelompok & persiapan ujian.</p>
+        <p class="small" style="color: var(--primary-600); font-style: italic;">*Saat ini masih dalam tahap pengembangan.</p>
+        <div class="hero-actions">
+          <button class="btn" id="startBtn">Mulai Belajar Sekarang</button>
+          <button class="btn secondary" id="learnMore">Lihat Fitur</button>
         </div>
 
-        <!-- right card: quick access -->
-        <aside class="hero-card" style="text-align:center">
-          <h3 style="margin-bottom:6px">Dashboard Cepat</h3>
-          <p class="small">Pilih mata pelajaran untuk mulai bergabung di grup & berdiskusi</p>
-          <div style="margin-top:12px" id="subjectQuick"></div>
-        </aside>
-      </section>
+        <!-- Highlights -->
+        <div class="grid" style="margin-top:18px">
+          <div class="card">
+            <strong>Forum Diskusi</strong>
+            <div class="small" style="margin-top:6px">Tanya jawab & solusi soal antar siswa.</div>
+          </div>
+          <div class="card">
+            <strong>Grup Belajar</strong>
+            <div class="small" style="margin-top:6px">Buat grup sesuai kelas atau topik.</div>
+          </div>
+          <div class="card">
+            <strong>Latihan Soal</strong>
+            <div class="small" style="margin-top:6px">Soal acak untuk setiap mata pelajaran.</div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Main layout: sidebar groups + forum -->
-      <section id="mainArea" style="display:none" class="layout">
-        <div class="sidebar card">
-          <h3 style="margin:0 0 8px 0">Grup Study <span class="feature-badge">Beta</span></h3>
-          <div class="small">Pilih grup atau buat yang baru</div>
-          <div id="groupList" class="group-list" style="margin-top:12px"></div>
+      <!-- right card: quick access -->
+      <aside class="hero-card" style="text-align:center">
+        <h3 style="margin-bottom:6px">Dashboard Cepat</h3>
+        <p class="small">Pilih jenjang dan mata pelajaran untuk mulai bergabung di grup & berdiskusi</p>
+        
+        <!-- Jenjang Selector -->
+        <div class="jenjang-selector" id="jenjangSelector">
+          <button class="jenjang-btn active" data-jenjang="SD">SD</button>
+          <button class="jenjang-btn" data-jenjang="SMP">SMP</button>
+          <button class="jenjang-btn" data-jenjang="SMA">SMA</button>
+        </div>
+        
+        <div style="margin-top:12px" id="subjectQuick"></div>
+      </aside>
+    </section>
 
-          <button class="btn secondary full-width" id="btnCreateGroup" style="margin-top:12px">+ Buat Grup Baru</button>
+    <!-- Main layout: sidebar groups + forum -->
+    <section id="mainArea" style="display:none" class="layout">
+      <div class="sidebar card">
+        <h3 style="margin:0 0 8px 0">Grup Study</h3>
+        <div class="small">Pilih grup atau buat yang baru</div>
+        <div id="groupList" class="group-list" style="margin-top:12px"></div>
+
+        <div class="new-group">
+          <input id="newGroupName" class="input" placeholder="Nama grup (contoh: Kelas 11 IPA 1)"/>
+          <select id="newGroupSubject" class="input" style="flex:0.8">
+            <!-- Options will be populated dynamically -->
+          </select>
+          <button class="btn" id="btnCreateGroup">Buat</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="groupHeader">
+          <h2 style="margin:0">Pilih Grup</h2>
+          <div class="small">Gabung ke grup untuk melihat forum</div>
         </div>
 
-        <div class="card">
-          <div id="groupHeader">
-            <h2 style="margin:0">Pilih Grup</h2>
-            <div class="small">Gabung ke grup untuk melihat forum</div>
+        <div id="forumArea" style="margin-top:12px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 id="groupTitle" style="margin:0">Group Title</h3>
+              <div class="small" id="groupMeta">Mata pelajaran • 0 anggota</div>
+            </div>
+            <div>
+              <button class="btn secondary" id="btnLeave">Keluar</button>
+              <button class="btn" id="btnJoin">Gabung</button>
+              <button class="btn secondary" id="btnQuizSubject" style="margin-left: 8px;">Latihan Soal</button>
+            </div>
           </div>
 
-          <div id="forumArea" style="margin-top:12px;display:none">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <h3 id="groupTitle" style="margin:0">Group Title</h3>
-                <div class="small" id="groupMeta">Mata pelajaran • 0 anggota</div>
-              </div>
-              <div>
-                <button class="btn secondary" id="btnLeave">Keluar</button>
-                <button class="btn" id="btnJoin">Gabung</button>
-              </div>
-            </div>
-
-            <!-- Post composer -->
-            <div style="margin-top:12px" class="post">
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <div style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700" id="avatarInitial">A</div>
-                <div style="flex:1">
-                  <textarea id="postText" rows="3" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eef6fb;resize:vertical" placeholder="Tulis pertanyaan atau catatan..."></textarea>
-                  
-                  <!-- File attachment -->
-                  <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-                    <button class="btn secondary" id="btnAttachFile" style="font-size:13px;padding:6px 10px">📎 Lampirkan File</button>
-                    <input type="file" id="fileInput" style="display:none" multiple>
-                    <div id="fileList" class="small"></div>
-                  </div>
-                  
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                    <div class="small">Tambahkan gambar atau link (opsional)</div>
-                    <div>
-                      <button class="btn secondary" id="btnClearPost">Bersihkan</button>
-                      <button class="btn" id="btnPost">Kirim</button>
-                    </div>
+          <!-- Post composer -->
+          <div style="margin-top:12px" class="post">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700" id="avatarInitial">A</div>
+              <div style="flex:1">
+                <textarea id="postText" rows="3" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eef6fb;resize:vertical" placeholder="Tulis pertanyaan atau catatan..."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                  <div class="small">Tambahkan gambar atau link (opsional)</div>
+                  <div>
+                    <button class="btn secondary" id="btnClearPost">Bersihkan</button>
+                    <button class="btn" id="btnPost">Kirim</button>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Post list -->
-            <div id="postsContainer" style="margin-top:12px"></div>
           </div>
 
+          <!-- Post list -->
+          <div id="postsContainer" style="margin-top:12px"></div>
         </div>
-      </section>
-    </div>
 
-    <!-- Profile View -->
-    <div id="profileView" class="profile-view">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <h2>Profil Saya <span class="feature-badge">Beta</span></h2>
-          <button class="btn secondary" id="btnBackToDashboard">← Kembali ke Dashboard</button>
-        </div>
-        
-        <div class="profile-header">
-          <div class="profile-avatar-large" id="profileAvatarLarge">A</div>
-          <div class="profile-info">
-            <h2 id="profileName">Nama Pengguna</h2>
-            <p class="small" id="profileEmail">Belum ada email</p>
-            <p class="small" id="profileBio">Belum ada bio</p>
-          </div>
-        </div>
-        
-        <div class="profile-stats">
-          <div class="profile-stat">
-            <div class="profile-stat-value" id="statGroups">0</div>
-            <div class="profile-stat-label">Grup</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-value" id="statPosts">0</div>
-            <div class="profile-stat-label">Postingan</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-value" id="statQuizScore">0%</div>
-            <div class="profile-stat-label">Skor Kuis Rata-rata</div>
-          </div>
-        </div>
-        
-        <div class="profile-content">
-          <div class="profile-section">
-            <h3>Grup Saya</h3>
-            <div id="userGroupsList" class="profile-list">
-              <div class="small">Belum bergabung dengan grup mana pun</div>
-            </div>
-          </div>
-          
-          <div class="profile-section">
-            <h3>Postingan Saya</h3>
-            <div id="userPostsList" class="profile-list">
-              <div class="small">Belum ada postingan</div>
-            </div>
-          </div>
-        </div>
-        
-        <div style="margin-top:20px">
-          <h3>Edit Profil</h3>
-          <div style="margin-top:12px">
-            <label class="small">Email (opsional)</label>
-            <input id="profileEmailInput" class="input full-width" placeholder="email@example.com" style="margin-top:4px"/>
-          </div>
-          <div style="margin-top:12px">
-            <label class="small">Bio (opsional)</label>
-            <textarea id="profileBioInput" class="input full-width" rows="3" placeholder="Ceritakan sedikit tentang dirimu..." style="margin-top:4px"></textarea>
-          </div>
-          <div style="margin-top:12px">
-            <button class="btn" id="profileSave">Simpan Perubahan</button>
-          </div>
-        </div>
       </div>
-    </div>
+    </section>
 
     <footer>
-      <div class="small">Prototype StudyPal • Dibuat untuk tugas • Data tersimpan lokal di browser</div>
+      <div class="small">Prototype StudyPal • Dibuat untuk tugas SMA • Data tersimpan lokal di browser</div>
     </footer>
   </main>
 
@@ -920,12 +296,14 @@
   <div id="modal" class="modal-backdrop">
     <div class="modal">
       <h3 id="modalTitle">Login / Register</h3>
-      <p class="small" id="modalDesc">Masukkan nama pengguna untuk mulai menggunakan StudyPal</p>
-      <div style="background:#fff3cd;border:1px solid #ffeaa7;border-radius:8px;padding:12px;margin:16px 0">
-        <div style="font-weight:600;color:#856404;font-size:13px">⚠️ Perhatian</div>
-        <div style="color:#856404;font-size:12px;margin-top:4px">StudyPal masih dalam tahap pengembangan. Data yang Anda masukkan mungkin tidak tersimpan secara permanen.</div>
-      </div>
-      <input id="inputName" class="input" placeholder="Nama lengkap atau nama panggilan"/>
+      <p class="small" id="modalDesc">Masukkan nama pengguna dan pilih jenjang untuk mulai menggunakan StudyPal</p>
+      <input id="inputName" class="input" placeholder="Nama lengkap atau nama panggilan" style="margin-bottom:12px"/>
+      <select id="inputJenjang" class="input">
+        <option value="">Pilih Jenjang</option>
+        <option value="SD">SD (Sekolah Dasar)</option>
+        <option value="SMP">SMP (Sekolah Menengah Pertama)</option>
+        <option value="SMA">SMA (Sekolah Menengah Atas)</option>
+      </select>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
         <button class="btn secondary" id="modalCancel">Batal</button>
         <button class="btn" id="modalSave">Simpan</button>
@@ -933,55 +311,13 @@
     </div>
   </div>
 
-  <!-- Modal: Create Group -->
-  <div id="modalCreateGroup" class="modal-backdrop">
-    <div class="modal">
-      <h3>Buat Grup Baru <span class="feature-badge">Beta</span></h3>
-      <p class="small">Buat grup belajar untukmu dan teman-temanmu</p>
-      
-      <div style="background:#e3f2fd;border:1px solid #bbdefb;border-radius:8px;padding:12px;margin:16px 0">
-        <div style="font-weight:600;color:#1565c0;font-size:13px">💡 Fitur Beta</div>
-        <div style="color:#1565c0;font-size:12px;margin-top:4px">Grup yang Anda buat akan tersimpan di browser ini. Fitur sinkronasi akan segera hadir.</div>
-      </div>
-      
-      <div style="margin-top:16px">
-        <label class="small">Nama Grup *</label>
-        <input id="groupNameInput" class="input full-width" placeholder="Contoh: Kelas 5A" style="margin-top:4px"/>
-      </div>
-      
-      <div style="margin-top:12px">
-        <label class="small">Mata Pelajaran *</label>
-        <select id="groupSubjectInput" class="input full-width" style="margin-top:4px">
-          <option value="">Pilih mata pelajaran</option>
-        </select>
-      </div>
-      
-      <div style="margin-top:12px">
-        <label class="small">Deskripsi (opsional)</label>
-        <textarea id="groupDescInput" class="input full-width" rows="3" placeholder="Deskripsikan tujuan grup ini" style="margin-top:4px"></textarea>
-      </div>
-      
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
-        <button class="btn secondary" id="createGroupCancel">Batal</button>
-        <button class="btn" id="createGroupSave">Buat Grup</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Modal: Quiz -->
   <div id="modalQuiz" class="modal-backdrop">
     <div class="modal" style="max-width:520px">
-      <h3>Kuis Cepat <span class="feature-badge">Beta</span></h3>
-      <p class="small">Pilih kategori dan jawab soal untuk menguji pemahamanmu.</p>
-      
-      <!-- Quiz categories -->
-      <div class="quiz-categories" id="quizCategories">
-        <div class="quiz-category active" data-category="all">Semua</div>
-      </div>
-      
+      <h3 id="quizTitle">Kuis Cepat</h3>
+      <p class="small" id="quizDesc">Soal acak untuk latihan.</p>
+      <p class="small" style="color: var(--muted); font-style: italic;">*Fitur ini masih dalam tahap pengembangan.</p>
       <div id="quizContent" style="margin-top:8px"></div>
-      <div id="quizResult" class="small"></div>
-      <div id="quizResultDetails" class="quiz-result-details" style="display:none;"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
         <div id="quizResult" class="small"></div>
         <div>
@@ -992,764 +328,606 @@
     </div>
   </div>
 
-  <!-- Modal: Leaderboard -->
-  <div id="leaderboardModal" class="modal-backdrop">
-    <div class="modal">
-      <div class="leaderboard-header">
-        <h3>🏆 Papan Peringkat <span class="feature-badge">Beta</span></h3>
-        <button class="btn secondary" id="leaderboardClose">Tutup</button>
-      </div>
-      <div class="leaderboard-tabs">
-        <div class="leaderboard-tab active" data-tab="all">Semua Waktu</div>
-      </div>
-      <div id="leaderboardContent">
-        <!-- Leaderboard list will be populated by JS -->
-      </div>
-    </div>
-  </div>
-
   <script>
     /***************
-     * StudyPal SMA Only Version - Fixed Login Modal for New Users
-     * - Removed level selection screen
-     * - Direct to main dashboard
-     * - Added development notices and beta badges
-     * - Fixed button functionality for new users
-     * - Enhanced quiz to show correct/incorrect answers
-     * - Data, subjects, and quizzes are level-specific
-     * - Added dedicated profile view and enhanced group creation
-     * - Added file sharing, notifications, enhanced quiz system
+     * StudyPal Prototype JS
+     * - Simple SPA behavior
      * - localStorage for persistence (groups & posts & username)
+     * - Multi jenjang with different subjects
+     * - Embedded questions for quizzes (3 per subject)
      ***************/
 
-    // --- Constants ---
+    // --- Jenjang and Subjects Configuration ---
+    const JENJANG_CONFIG = {
+      SD: {
+        name: "SD",
+        subjects: [
+          { name: "Matematika", icon: "📐", class: "s-math" },
+          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
+          { name: "IPA", icon: "🔬", class: "s-bio" },
+          { name: "IPS", icon: "🌍", class: "s-ips" }
+        ]
+      },
+      SMP: {
+        name: "SMP",
+        subjects: [
+          { name: "Matematika", icon: "📐", class: "s-math" },
+          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
+          { name: "IPA", icon: "🔬", class: "s-bio" },
+          { name: "IPS", icon: "🌍", class: "s-ips" },
+          { name: "Bahasa Inggris", icon: "🇬🇧", class: "s-eng" }
+        ]
+      },
+      SMA: {
+        name: "SMA",
+        subjects: [
+          { name: "Matematika", icon: "📐", class: "s-math" },
+          { name: "Fisika", icon: "⚡", class: "s-phys" },
+          { name: "Biologi", icon: "🧬", class: "s-bio" },
+          { name: "Kimia", icon: "🧪", class: "s-kimia" },
+          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
+          { name: "Bahasa Inggris", icon: "🇬🇧", class: "s-eng" },
+          { name: "Ekonomi", icon: "💰", class: "s-eko" },
+          { name: "Geografi", icon: "🗺️", class: "s-geo" },
+          { name: "Sejarah", icon: "📜", class: "s-sej" },
+          { name: "Sosiologi", icon: "👥", class: "s-sos" }
+        ]
+      }
+    };
+
+    // --- Embedded Questions Bank (3 per subject) ---
+    const QUESTIONS_BANK = {
+      SD: {
+        "Matematika": [
+          { q: "Hasil dari 5 + 3 adalah...", a: ["7", "8", "9"], correct: 1 },
+          { q: "Angka romawi untuk 10 adalah...", a: ["V", "X", "L"], correct: 1 },
+          { q: "Bentuk dari segitiga memiliki... sisi", a: ["2", "3", "4"], correct: 1 }
+        ],
+        "Bahasa Indonesia": [
+          { q: "Kata 'bermain' adalah kata...", a: ["Benda", "Kerja", "Sifat"], correct: 1 },
+          { q: "Huruf kapital untuk awal kalimat adalah huruf...", a: ["Kecil", "Besar", "Miring"], correct: 1 },
+          { q: "Siapa nama tokoh dalam cerita 'Malin Kundang'?", a: ["Bawang Merah", "Malin Kundang", "Timun Mas"], correct: 1 }
+        ],
+        "IPA": [
+          { q: "Sumber energi matahari berasal dari...", a: ["Bumi", "Angkasa", "Air"], correct: 1 },
+          { q: "Hewan yang bernapas dengan insang adalah...", a: ["Kucing", "Ikan", "Ayam"], correct: 1 },
+          { q: "Bagian tumbuhan yang menyerap air adalah...", a: ["Daun", "Akar", "Batang"], correct: 1 }
+        ],
+        "IPS": [
+          { q: "Ibukota Indonesia adalah...", a: ["Surabaya", "Jakarta", "Bandung"], correct: 1 },
+          { q: "Profesi seseorang yang mengajar di sekolah disebut...", a: ["Dokter", "Guru", "Polisi"], correct: 1 },
+          { q: "Alat untuk menunjukkan arah disebut...", a: ["Peta", "Kompas", "Globe"], correct: 1 }
+        ]
+      },
+      SMP: {
+        "Matematika": [
+          { q: "Hasil dari (2 + 3) x 4 adalah...", a: ["20", "14", "11"], correct: 0 },
+          { q: "Persamaan garis lurus dengan gradien 2 dan melalui titik (0,3) adalah...", a: ["y = 2x + 3", "y = 3x + 2", "y = 2x - 3"], correct: 0 },
+          { q: "Akar kuadrat dari 144 adalah...", a: ["10", "11", "12"], correct: 2 }
+        ],
+        "Bahasa Indonesia": [
+          { q: "Kalimat yang berisi perintah disebut kalimat...", a: ["Berita", "Tanya", "Perintah"], correct: 2 },
+          { q: "Majas perbandingan yang menggunakan kata 'bagai' atau 'laksana' disebut...", a: ["Personifikasi", "Simile", "Metafora"], correct: 1 },
+          { q: "Struktur teks eksposisi terdiri dari tesis, argumen, dan...", a: ["Koda", "Konklusi", "Orientasi"], correct: 1 }
+        ],
+        "IPA": [
+          { q: "Zat yang tersusun dari satu jenis atom disebut...", a: ["Senyawa", "Unsur", "Campuran"], correct: 1 },
+          { q: "Gaya yang bekerja pada benda yang bergerak melingkar disebut...", a: ["Gaya sentripetal", "Gaya sentrifugal", "Gaya gravitasi"], correct: 0 },
+          { q: "Organel sel yang berfungsi sebagai tempat respirasi seluler adalah...", a: ["Nukleus", "Mitokondria", "Kloroplas"], correct: 1 }
+        ],
+        "IPS": [
+          { q: "Pendorong utama kegiatan ekonomi masyarakat adalah...", a: ["Kebutuhan", "Keinginan", "Permintaan"], correct: 0 },
+          { q: "Lembaga sosial yang dibentuk untuk menjaga ketertiban masyarakat adalah...", a: ["Keluarga", "Negara", "Sekolah"], correct: 1 },
+          { q: "Letak geografis Indonesia yang sangat strategis karena berada di antara dua samudra adalah...", a: ["Asia dan Australia", "Samudra Hindia dan Pasifik", "Benua Asia dan Eropa"], correct: 1 }
+        ],
+        "Bahasa Inggris": [
+          { q: "I ____ to school every day.", a: ["go", "goes", "went"], correct: 0 },
+          { q: "She is ____ than her sister.", a: ["tall", "taller", "tallest"], correct: 1 },
+          { q: "The book is ____ the table.", a: ["in", "on", "at"], correct: 1 }
+        ]
+      },
+      SMA: {
+        "Matematika": [
+          { q: "Turunan pertama dari f(x) = 3x² + 2x - 5 adalah...", a: ["6x + 2", "6x - 2", "3x + 2"], correct: 0 },
+          { q: "Jika sin A = 3/5, maka cos A adalah...", a: ["4/5", "5/4", "3/4"], correct: 0 },
+          { q: "Limit dari (x² - 4) / (x - 2) saat x mendekati 2 adalah...", a: ["0", "2", "4"], correct: 2 }
+        ],
+        "Fisika": [
+          { q: "Benda bermassa 2 kg dikenai gaya 10 N. Percepatan benda tersebut adalah...", a: ["5 m/s²", "10 m/s²", "20 m/s²"], correct: 0 },
+          { q: "Energi kinetik benda bermassa 4 kg yang bergerak dengan kecepatan 3 m/s adalah...", a: ["12 J", "18 J", "24 J"], correct: 1 },
+          { q: "Hukum II Newton menyatakan bahwa resultan gaya sama dengan...", a: ["Massa x Percepatan", "Massa / Percepatan", "Percepatan / Massa"], correct: 0 }
+        ],
+        "Biologi": [
+          { q: "Enzim yang menghancurkan protein dalam makanan adalah...", a: ["Amilase", "Protease", "Lipase"], correct: 1 },
+          { q: "Pernapasan yang menghasilkan energi paling banyak adalah...", a: ["Anaerob", "Aerob", "Fermentasi"], correct: 1 },
+          { q: "Fotosintesis terjadi di dalam organel bernama...", a: ["Mitokondria", "Kloroplas", "Ribosom"], correct: 1 }
+        ],
+        "Kimia": [
+          { q: "Jumlah mol dalam 5,4 gram air (H₂O, Ar H=1, O=16) adalah...", a: ["0,1 mol", "0,3 mol", "0,5 mol"], correct: 1 },
+          { q: "Reaksi pengikatan antara ion positif dan ion negatif disebut...", a: ["Ikatan Kovalen", "Ikatan Ion", "Ikatan Logam"], correct: 1 },
+          { q: "Unsur yang paling elektronegatif adalah...", a: ["Natrium", "Fluor", "Oksigen"], correct: 1 }
+        ],
+        "Bahasa Indonesia": [
+          { q: "Novel 'Siti Nurbaya' karya Marah Rusli termasuk angkatan...", a: ["Balai Pustaka", "Pujangga Baru", "66"], correct: 0 },
+          { q: "Kalimat yang mengandung pertentangan makna antara bagian sebelum dan sesudah koma disebut...", a: ["Paralelisme", "Antitesis", "Elipsis"], correct: 1 },
+          { q: "Nilai dalam sebuah cerita yang berkaitan dengan kebenaran umum disebut nilai...", a: ["Religius", "Sosial", "Universal"], correct: 2 }
+        ],
+        "Bahasa Inggris": [
+          { q: "If I had studied harder, I ____ the exam.", a: ["would pass", "would have passed", "will pass"], correct: 1 },
+          { q: "The train ____ by the time I arrived at the station.", a: ["had left", "has left", "leaves"], correct: 0 },
+          { q: "He suggested ____ a break.", a: ["to take", "taking", "take"], correct: 1 }
+        ],
+        "Ekonomi": [
+          { q: "Kebijakan pemerintah untuk menaikkan suku bunga bertujuan untuk...", a: ["Meningkatkan inflasi", "Mengurangi inflasi", "Meningkatkan investasi"], correct: 1 },
+          { q: "Badan usaha yang modalnya berasal dari masyarakat umum adalah...", a: ["BUMN", "BUMD", "Perseroan Terbatas"], correct: 2 },
+          { q: "Pajak yang beban pemungutannya dapat dialihkan kepada pihak lain disebut pajak...", a: ["Langsung", "Tidak Langsung", "Subjek"], correct: 1 }
+        ],
+        "Geografi": [
+          { q: "Proses pelapukan batuan secara fisika oleh suhu yang ekstrem disebut...", a: ["Pelapukan kimia", "Pelapukan biologis", "Pelapukan fisik"], correct: 2 },
+          { q: "Lapisan atmosfer yang paling dekat dengan permukaan bumi adalah...", a: ["Troposfer", "Stratosfer", "Mesosfer"], correct: 0 },
+          { q: "Peta yang menunjukkan batas-batas administrasi suatu wilayah disebut peta...", a: ["Topografi", "Administrasi", "Tematik"], correct: 1 }
+        ],
+        "Sejarah": [
+          { q: "Pembacaan teks Proklamasi Kemerdekaan Indonesia dilakukan pada tanggal...", a: ["16 Agustus 1945", "17 Agustus 1945", "18 Agustus 1945"], correct: 1 },
+          { q: "Raja yang memerintah Kerajaan Majapahit pada masa keemasan adalah...", a: ["Raden Wijaya", "Hayam Wuruk", "Sriwijaya"], correct: 1 },
+          { q: "Kebijakan pemerintah Belanda yang membatasi kekuatan raja-raja lokal disebut...", a: ["Politik Etis", "Kultuur Stelsel", "Politik Balas Budi"], correct: 1 }
+        ],
+        "Sosiologi": [
+          { q: "Proses di mana individu mengadopsi norma dan nilai masyarakat disebut...", a: ["Interaksi", "Sosialisasi", "Akomodasi"], correct: 1 },
+          { q: "Kelompok sosial yang keanggotaannya didasarkan pada kedekatan emosional disebut...", a: ["Golongan", "Paguyuban", "Patembayan"], correct: 1 },
+          { q: "Perubahan sosial yang terjadi dengan cepat dan drastis disebut...", a: ["Evolusi", "Revolusi", "Reformasi"], correct: 1 }
+        ]
+      }
+    };
+
+    // --- Initial data ---
+    const SAMPLE_GROUPS = [
+      { id: genId(), name: "Kelas 5 SD", jenjang: "SD", subject: "Matematika", members: [], posts: [] },
+      { id: genId(), name: "Kelas 8 IPA", jenjang: "SMP", subject: "IPA", members: [], posts: [] },
+      { id: genId(), name: "Kelas 11 IPA 1", jenjang: "SMA", subject: "Fisika", members: [], posts: [] },
+      { id: genId(), name: "Reading Club", jenjang: "SMA", subject: "Bahasa Inggris", members: [], posts: [] }
+    ];
     const STORAGE_KEY = 'studypal_data_v1';
     const STORAGE_USER = 'studypal_user_v1';
-    const STORAGE_PROFILE = 'studypal_profile_v1';
-    const STORAGE_NOTIFICATIONS = 'studypal_notifications_v1';
-    const STORAGE_QUIZ_SCORES = 'studypal_quiz_scores_v1';
 
     // --- util ---
     function genId(){ return 'id-' + Math.random().toString(36).slice(2,9) }
     function saveData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }
     function loadData(){
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw){ 
-        const initialData = DATA_BY_LEVEL.sma.sampleGroups.map(g => ({...g, level: 'sma'}));
-        saveData(initialData); 
-        return initialData.slice(); 
-      }
-      try{ return JSON.parse(raw) } catch(e){ 
-        const initialData = DATA_BY_LEVEL.sma.sampleGroups.map(g => ({...g, level: 'sma'}));
-        saveData(initialData); 
-        return initialData.slice(); 
-      }
+      if(!raw){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
+      try{ return JSON.parse(raw) } catch(e){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
     }
-    function formatDate(d){ 
-      const date = new Date(d);
-      return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
 
-    // --- Data by Level ---
-    const DATA_BY_LEVEL = {
-      sma: {
-        subjects: [
-          { name: "Matematika", icon: "∫", class: "s-math" },
-          { name: "Fisika", icon: "⚡", class: "s-phys" },
-          { name: "Biologi", icon: "🧫", class: "s-bio" },
-          { name: "Kimia", icon: "🧯", class: "s-bio" },
-          { name: "Bahasa Indonesia", icon: "📜", class: "s-indo" },
-          { name: "Bahasa Inggris", icon: "🌐", class: "s-eng" },
-          { name: "Ekonomi", icon: "💹", class: "s-geo" },
-          { name: "Geografi", icon: "🌏", class: "s-geo" },
-          { name: "Sosiologi", icon: "👥", class: "s-geo" },
-          { name: "Sejarah", icon: "📚", class: "s-geo" },
-          { name: "PAI", icon: "☪️", class: "s-pai" },
-          { name: "Informatika", icon: "👨‍💻", class: "s-info" },
-          { name: "Bahasa Jawa", icon: "ꦲ", class: "s-jawa" }
-        ],
-        sampleGroups: [
-          { id: genId(), name: "Kelas 11 IPA 1", subject: "Matematika", members: [], posts: [], description: "Grup untuk belajar matematika kelas 11 IPA 1" },
-          { id: genId(), name: "Persiapan UN 12 IPA", subject: "Fisika", members: [], posts: [], description: "Grup persiapan UN Fisika" },
-          { id: genId(), name: "Biologi: Ekologi", subject: "Biologi", members: [], posts: [], description: "Fokus pada materi ekologi" },
-          { id: genId(), name: "Reading Club", subject: "Bahasa Inggris", members: [], posts: [], description: "Grup untuk meningkatkan kemampuan reading" },
-          { id: genId(), name: "Studi Al-Quran", subject: "PAI", members: [], posts: [], description: "Diskusi dan kajian Al-Quran" },
-          { id: genId(), name: "Peta Indonesia", subject: "Geografi", members: [], posts: [], description: "Mempelajari geografi Indonesia" },
-          { id: genId(), name: "Coding Club", subject: "Informatika", members: [], posts: [], description: "Belajar programming bersama" },
-          { id: genId(), name: "Basa Jawa", subject: "Bahasa Jawa", members: [], posts: [], description: "Melestarikan bahasa Jawa" }
-        ],
-        quizQuestions: {
-          matematika: [
-            { q: '1) Fungsi turunan dari f(x)=x² adalah...', a: ['2x', 'x', 'x²', '1'], correct: 0 },
-            { q: '2) Hasil dari integral ∫2x dx adalah...', a: ['x² + C', '2x² + C', 'x + C', '2x + C'], correct: 0 },
-            { q: '3) Nilai dari sin² 30° + cos² 30° adalah...', a: ['0', '1/2', '1', '2'], correct: 2 }
-          ],
-          fisika: [
-            { q: '1) Hukum Newton kedua menyatakan...', a: ['F = ma', 'E = mc²', 'V = IR', 'PV = nRT'], correct: 0 },
-            { q: '2) Satuan dari gaya adalah...', a: ['Newton', 'Joule', 'Watt', 'Pascal'], correct: 0 },
-            { q: '3) Kecepatan cahaya dalam ruang hampa adalah...', a: ['3×10⁸ m/s', '3×10⁶ m/s', '3×10⁴ m/s', '3×10² m/s'], correct: 0 }
-          ],
-          pai: [
-            { q: '1) Surah Al-Fatihah memiliki ayat sebanyak...', a: ['5 ayat', '6 ayat', '7 ayat', '8 ayat'], correct: 2 },
-            { q: '2) Rukun Islam yang pertama adalah...', a: ['Shalat', 'Puasa', 'Zakat', 'Syahadat'], correct: 3 },
-            { q: '3) Nabi Muhammad SAW menerima wahyu pertama di gua...', a: ['Hira', 'Tsur', 'Saur', 'Thawr'], correct: 0 }
-          ]
-        }
-      }
-    };
+    // --- state ---
+    let groups = loadData();
+    let currentUser = localStorage.getItem(STORAGE_USER) || null;
+    let currentUserJenjang = localStorage.getItem('studypal_jenjang') || 'SD';
+    let currentGroupId = null;
+    let currentJenjang = 'SD';
+    let currentQuizQuestions = [];
 
-    // --- Global state ---
-    let currentUser = null;
-    let currentGroup = null;
-    let groups = [];
-    let posts = [];
-    let quizState = { category: 'all', questions: [], answers: [] };
-    let leaderboardTab = 'all';
+    // --- elements ---
+    const btnLogin = document.getElementById('btn-login');
+    const userArea = document.getElementById('userArea');
+    const modal = document.getElementById('modal');
+    const modalSave = document.getElementById('modalSave');
+    const modalCancel = document.getElementById('modalCancel');
+    const inputName = document.getElementById('inputName');
+    const inputJenjang = document.getElementById('inputJenjang');
+    const startBtn = document.getElementById('startBtn');
+    const learnMoreBtn = document.getElementById('learnMore');
+    const mainArea = document.getElementById('mainArea');
+    const subjectQuick = document.getElementById('subjectQuick');
+    const jenjangSelector = document.getElementById('jenjangSelector');
+    const groupListEl = document.getElementById('groupList');
+    const btnCreateGroup = document.getElementById('btnCreateGroup');
+    const newGroupName = document.getElementById('newGroupName');
+    const newGroupSubject = document.getElementById('newGroupSubject');
+    const forumArea = document.getElementById('forumArea');
+    const groupTitle = document.getElementById('groupTitle');
+    const groupMeta = document.getElementById('groupMeta');
+    const postsContainer = document.getElementById('postsContainer');
+    const postText = document.getElementById('postText');
+    const btnPost = document.getElementById('btnPost');
+    const btnClearPost = document.getElementById('btnClearPost');
+    const avatarInitial = document.getElementById('avatarInitial');
+    const btnJoin = document.getElementById('btnJoin');
+    const btnLeave = document.getElementById('btnLeave');
+    const btnQuiz = document.getElementById('btn-quiz');
+    const btnQuizSubject = document.getElementById('btnQuizSubject');
+    const modalQuiz = document.getElementById('modalQuiz');
+    const quizTitle = document.getElementById('quizTitle');
+    const quizDesc = document.getElementById('quizDesc');
+    const quizContent = document.getElementById('quizContent');
+    const quizSubmit = document.getElementById('quizSubmit');
+    const quizClose = document.getElementById('quizClose');
+    const quizResult = document.getElementById('quizResult');
 
-    // --- Initialize app ---
-    async function initApp() {
-      // Load user data from localStorage
-      const savedUser = localStorage.getItem(STORAGE_USER);
-      
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        showDashboard();
-      } else {
-        showDashboard();
-        // Langsung tampilkan modal login untuk user baru
-        showLoginModal();
-      }
-
-      // Setup event listeners
-      setupEventListeners();
-    }
-
-    // --- Event Listeners ---
-    function setupEventListeners() {
-      // Header buttons
-      document.getElementById('btn-login').addEventListener('click', showLoginModal);
-      document.getElementById('btn-profile').addEventListener('click', () => {
-        if (!currentUser) {
-          showLoginModal();
-        } else {
-          showProfile();
-        }
-      });
-      document.getElementById('btn-leaderboard').addEventListener('click', () => {
-        if (!currentUser) {
-          showLoginModal();
-        } else {
-          showLeaderboard();
-        }
-      });
-      document.getElementById('btn-quiz').addEventListener('click', () => {
-        if (!currentUser) {
-          showLoginModal();
-        } else {
-          showQuiz();
-        }
-      });
-
-      // Dashboard buttons
-      document.getElementById('startBtn').addEventListener('click', () => {
-        if (!currentUser) {
-          showLoginModal();
-        } else {
-          document.getElementById('mainArea').style.display = 'grid';
-          renderGroups();
-        }
-      });
-      document.getElementById('learnMore').addEventListener('click', () => {
-        alert('Fitur-fitur StudyPal:\n\n1. Forum Diskusi - Tanya jawab & solusi soal antar siswa\n2. Grup Belajar - Buat grup sesuai kelas atau topik\n3. Kuis Interaktif - Latihan singkat untuk memperkuat pemahaman\n4. Leaderboard - Lihat peringkatmu dan bersaing dengan teman\n5. Profil Personal - Kelola informasi dan lihat statistik belajarmu\n\n⚠️ Fitur masih dalam tahap pengembangan (Beta)');
-      });
-
-      // Group management
-      document.getElementById('btnCreateGroup').addEventListener('click', () => {
-        if (!currentUser) {
-          showLoginModal();
-        } else {
-          showCreateGroupModal();
-        }
-      });
-      document.getElementById('btnJoin').addEventListener('click', joinCurrentGroup);
-      document.getElementById('btnLeave').addEventListener('click', leaveCurrentGroup);
-
-      // Post management
-      document.getElementById('btnPost').addEventListener('click', createPost);
-      document.getElementById('btnClearPost').addEventListener('click', clearPost);
-      document.getElementById('btnAttachFile').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-      });
-      document.getElementById('fileInput').addEventListener('change', handleFileSelect);
-
-      // Modal buttons
-      document.getElementById('modalCancel').addEventListener('click', hideModal);
-      document.getElementById('modalSave').addEventListener('click', saveUser);
-      document.getElementById('createGroupCancel').addEventListener('click', hideCreateGroupModal);
-      document.getElementById('createGroupSave').addEventListener('click', saveGroup);
-
-      // Quiz modal
-      document.getElementById('quizClose').addEventListener('click', hideQuizModal);
-      document.getElementById('quizSubmit').addEventListener('click', submitQuiz);
-
-      // Leaderboard modal
-      document.getElementById('leaderboardClose').addEventListener('click', hideLeaderboardModal);
-      document.querySelectorAll('.leaderboard-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          leaderboardTab = tab.dataset.tab;
-          document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          renderLeaderboard();
-        });
-      });
-
-      // Profile view
-      document.getElementById('btnBackToDashboard').addEventListener('click', hideProfile);
-      document.getElementById('profileSave').addEventListener('click', saveProfile);
-
-      // Notification panel
-      document.getElementById('userArea').addEventListener('click', toggleNotifications);
-    }
-
-    // --- View Management ---
-    function showDashboard() {
-      document.getElementById('dashboardView').style.display = 'block';
-      document.getElementById('profileView').style.display = 'none';
-      
-      // Update header
-      if (currentUser) {
-        document.getElementById('btn-login').style.display = 'none';
-        document.getElementById('btn-profile').style.display = 'block';
-        document.getElementById('userArea').style.display = 'flex';
-        
-        // Update user area
-        document.getElementById('avatarInitial').textContent = currentUser.name.charAt(0).toUpperCase();
-      } else {
-        document.getElementById('btn-login').style.display = 'block';
-        document.getElementById('btn-profile').style.display = 'none';
-        document.getElementById('userArea').style.display = 'none';
-      }
-      
-      // Render subject quick access
+    // --- init UI ---
+    function init(){
+      refreshUserUI();
+      renderJenjangSelector();
       renderSubjectQuick();
+      renderGroupList();
+      attachListeners();
+      if(currentUser) {
+        document.getElementById('startBtn').textContent = 'Buka Dashboard';
+      }
     }
 
-    function showProfile() {
-      document.getElementById('dashboardView').style.display = 'none';
-      document.getElementById('profileView').style.display = 'block';
-      renderProfile();
+    function refreshUserUI(){
+      if(currentUser){
+        btnLogin.style.display='none';
+        userArea.style.display='flex';
+        userArea.textContent = `${currentUser} (${currentUserJenjang})`;
+        avatarInitial.textContent = currentUser.slice(0,1).toUpperCase();
+      } else {
+        btnLogin.style.display='inline-block';
+        userArea.style.display='none';
+      }
     }
 
-    function hideProfile() {
-      document.getElementById('dashboardView').style.display = 'block';
-      document.getElementById('profileView').style.display = 'none';
+    // --- render jenjang selector ---
+    function renderJenjangSelector(){
+      jenjangSelector.innerHTML = '';
+      Object.keys(JENJANG_CONFIG).forEach(jenjang => {
+        const btn = document.createElement('button');
+        btn.className = 'jenjang-btn' + (jenjang === currentJenjang ? ' active' : '');
+        btn.dataset.jenjang = jenjang;
+        btn.textContent = jenjang;
+        btn.addEventListener('click', () => selectJenjang(jenjang));
+        jenjangSelector.appendChild(btn);
+      });
     }
 
-    function showLoginModal() {
-      const modal = document.getElementById('modal');
-      modal.style.display = 'flex';
-      modal.classList.add('force-show');
-      document.getElementById('modalTitle').textContent = 'Masuk ke StudyPal';
-      document.getElementById('modalDesc').textContent = 'Masukkan nama pengguna untuk mulai menggunakan StudyPal';
+    // --- select jenjang ---
+    function selectJenjang(jenjang){
+      currentJenjang = jenjang;
+      document.querySelectorAll('.jenjang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.jenjang === jenjang);
+      });
+      renderSubjectQuick();
+      renderGroupList();
+      updateSubjectSelect();
+    }
+
+    // --- render quick subjects ---
+    function renderSubjectQuick(){
+      subjectQuick.innerHTML = '';
+      const subjects = JENJANG_CONFIG[currentJenjang].subjects;
       
-      // Focus pada input field
-      setTimeout(() => {
-        document.getElementById('inputName').focus();
-      }, 100);
+      subjects.forEach(subject => {
+        const el = document.createElement('div');
+        el.className = 'subject';
+        el.style.cursor = 'pointer';
+        el.dataset.sub = subject.name;
+        el.innerHTML = `
+          <div class="icon ${subject.class}">${subject.icon}</div>
+          <div>
+            <div style="font-weight:700">${subject.name}</div>
+            <div class="small">Soal & diskusi</div>
+          </div>
+        `;
+        el.addEventListener('click', () => {
+          openDashboardForSubject(subject.name);
+        });
+        subjectQuick.appendChild(el);
+      });
     }
 
-    function hideModal() {
-      const modal = document.getElementById('modal');
-      modal.style.display = 'none';
-      modal.classList.remove('force-show');
-    }
-
-    function showCreateGroupModal() {
-      document.getElementById('modalCreateGroup').style.display = 'flex';
-      // Populate subject dropdown
-      const subjectSelect = document.getElementById('groupSubjectInput');
-      subjectSelect.innerHTML = '<option value="">Pilih mata pelajaran</option>';
-      DATA_BY_LEVEL.sma.subjects.forEach(subject => {
+    // --- update subject select dropdown ---
+    function updateSubjectSelect(){
+      newGroupSubject.innerHTML = '';
+      const subjects = JENJANG_CONFIG[currentJenjang].subjects;
+      subjects.forEach(subject => {
         const option = document.createElement('option');
         option.value = subject.name;
         option.textContent = subject.name;
-        subjectSelect.appendChild(option);
+        newGroupSubject.appendChild(option);
       });
     }
 
-    function hideCreateGroupModal() {
-      document.getElementById('modalCreateGroup').style.display = 'none';
+    // --- open dashboard for subject ---
+    function openDashboardForSubject(subject){
+      mainArea.style.display='grid';
+      renderGroupList(currentJenjang, subject);
     }
 
-    function showQuiz() {
-      document.getElementById('modalQuiz').style.display = 'flex';
-      renderQuizCategories();
-      renderQuizContent();
-    }
-
-    function hideQuizModal() {
-      document.getElementById('modalQuiz').style.display = 'none';
-      quizState = { category: 'all', questions: [], answers: [] };
-    }
-
-    function showLeaderboard() {
-      document.getElementById('leaderboardModal').style.display = 'flex';
-      renderLeaderboard();
-    }
-
-    function hideLeaderboardModal() {
-      document.getElementById('leaderboardModal').style.display = 'none';
-    }
-
-    function toggleNotifications() {
-      const panel = document.getElementById('notificationPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      if (panel.style.display === 'block') {
-        renderNotifications();
-      }
-    }
-
-    // --- Data Management ---
-    function saveUser() {
-      const name = document.getElementById('inputName').value.trim();
-      if (name) {
-        currentUser = { id: genId(), name: name };
-        localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-        hideModal();
-        showDashboard();
-      }
-    }
-
-    function saveGroup() {
-      const name = document.getElementById('groupNameInput').value.trim();
-      const subject = document.getElementById('groupSubjectInput').value;
+    // --- render groups ---
+    function renderGroupList(jenjangFilter, subjectFilter){
+      groupListEl.innerHTML = '';
+      let filtered = groups;
       
-      if (name && subject && currentUser) {
-        const newGroup = {
-          id: genId(),
-          name: name,
-          subject: subject,
-          description: document.getElementById('groupDescInput').value.trim(),
-          level: 'sma',
-          members: [currentUser.id],
-          createdAt: new Date()
-        };
-        
-        groups.push(newGroup);
-        saveData(groups);
-        hideCreateGroupModal();
-        renderGroups();
+      if(jenjangFilter) {
+        filtered = filtered.filter(g => g.jenjang === jenjangFilter);
       }
-    }
-
-    function createPost() {
-      const content = document.getElementById('postText').value.trim();
-      if (content && currentGroup && currentUser) {
-        const newPost = {
-          id: genId(),
-          author: currentUser.name,
-          content: content,
-          createdAt: new Date(),
-          upvotes: 0,
-          replies: []
-        };
-        
-        if (!currentGroup.posts) currentGroup.posts = [];
-        currentGroup.posts.unshift(newPost);
-        saveData(groups);
-        clearPost();
-        renderPosts();
+      
+      if(subjectFilter) {
+        filtered = filtered.filter(g => g.subject === subjectFilter);
       }
-    }
-
-    function clearPost() {
-      document.getElementById('postText').value = '';
-      document.getElementById('fileList').innerHTML = '';
-    }
-
-    function handleFileSelect(e) {
-      const files = Array.from(e.target.files);
-      const fileList = document.getElementById('fileList');
-      fileList.innerHTML = files.map(file => `<div class="small">📎 ${file.name}</div>`).join('');
-    }
-
-    function joinCurrentGroup() {
-      if (currentGroup && currentUser && !currentGroup.members.includes(currentUser.id)) {
-        currentGroup.members.push(currentUser.id);
-        saveData(groups);
-        renderGroups();
-        renderForum();
-      }
-    }
-
-    function leaveCurrentGroup() {
-      if (currentGroup && currentUser) {
-        currentGroup.members = currentGroup.members.filter(id => id !== currentUser.id);
-        saveData(groups);
-        currentGroup = null;
-        renderGroups();
-        hideForum();
-      }
-    }
-
-    function saveProfile() {
-      if (!currentUser) return;
       
-      const email = document.getElementById('profileEmailInput').value.trim();
-      const bio = document.getElementById('profileBioInput').value.trim();
-      
-      currentUser.email = email;
-      currentUser.bio = bio;
-      
-      localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
-      alert('Profil berhasil disimpan!');
-      renderProfile();
-    }
-
-    // --- Rendering Functions ---
-    function renderSubjectQuick() {
-      const container = document.getElementById('subjectQuick');
-      const subjects = DATA_BY_LEVEL.sma.subjects;
-      
-      container.innerHTML = subjects.map(subject => `
-        <div class="subject" data-subject="${subject.name}">
-          <div class="icon ${subject.class}">${subject.icon}</div>
-          <div>
-            <div style="font-weight:600">${subject.name}</div>
-            <div class="small">Lihat grup</div>
-          </div>
-        </div>
-      `).join('');
-      
-      // Add click handlers
-      container.querySelectorAll('.subject').forEach(subjectEl => {
-        subjectEl.addEventListener('click', () => {
-          if (!currentUser) {
-            showLoginModal();
-            return;
-          }
-          const subjectName = subjectEl.dataset.subject;
-          document.getElementById('mainArea').style.display = 'grid';
-          renderGroups(subjectName);
-        });
+      filtered.forEach(g=>{
+        const el = document.createElement('div');
+        el.className = 'group-item' + (g.id === currentGroupId ? ' active' : '');
+        el.dataset.id = g.id;
+        el.innerHTML = `<strong>${g.name}</strong><div class="small" style="margin-top:6px">${g.jenjang} - ${g.subject} • ${g.members.length} anggota</div>`;
+        el.addEventListener('click', ()=> openGroup(g.id));
+        groupListEl.appendChild(el);
       });
     }
 
-    function renderGroups(filterSubject = null) {
-      const container = document.getElementById('groupList');
-      const levelGroups = groups.filter(g => g.level === 'sma');
-      const filteredGroups = filterSubject 
-        ? levelGroups.filter(g => g.subject === filterSubject)
-        : levelGroups;
-      
-      container.innerHTML = filteredGroups.map(group => `
-        <div class="group-item ${currentGroup?.id === group.id ? 'active' : ''}" data-group-id="${group.id}">
-          <div style="font-weight:600">${group.name}</div>
-          <div class="small">${group.subject} • ${group.members.length} anggota</div>
-        </div>
-      `).join('');
-      
-      // Add click handlers
-      container.querySelectorAll('.group-item').forEach(groupEl => {
-        groupEl.addEventListener('click', () => {
-          if (!currentUser) {
-            showLoginModal();
-            return;
-          }
-          const groupId = groupEl.dataset.groupId;
-          currentGroup = groups.find(g => g.id === groupId);
-          renderGroups();
-          renderForum();
-        });
-      });
+    // --- open group view ---
+    function openGroup(groupId){
+      const g = groups.find(x=>x.id===groupId);
+      if(!g) return;
+      currentGroupId = groupId;
+      forumArea.style.display = 'block';
+      groupTitle.textContent = g.name;
+      groupMeta.textContent = `${g.jenjang} - ${g.subject} • ${g.members.length} anggota`;
+      const isMember = currentUser && g.members.includes(currentUser);
+      btnJoin.style.display = isMember ? 'none' : 'inline-block';
+      btnLeave.style.display = isMember ? 'inline-block' : 'none';
+      avatarInitial.textContent = currentUser ? currentUser.slice(0,1).toUpperCase() : 'A';
+      renderPosts(g.posts);
+      renderGroupList();
     }
 
-    function renderForum() {
-      if (!currentGroup || !currentUser) return;
-      
-      document.getElementById('groupHeader').style.display = 'none';
-      document.getElementById('forumArea').style.display = 'block';
-      
-      document.getElementById('groupTitle').textContent = currentGroup.name;
-      document.getElementById('groupMeta').textContent = `${currentGroup.subject} • ${currentGroup.members.length} anggota`;
-      
-      const isMember = currentGroup.members.includes(currentUser.id);
-      document.getElementById('btnJoin').style.display = isMember ? 'none' : 'block';
-      document.getElementById('btnLeave').style.display = isMember ? 'block' : 'none';
-      
-      renderPosts();
-    }
-
-    function hideForum() {
-      document.getElementById('groupHeader').style.display = 'block';
-      document.getElementById('forumArea').style.display = 'none';
-    }
-
-    function renderPosts() {
-      if (!currentGroup) return;
-      
-      const container = document.getElementById('postsContainer');
-      const posts = currentGroup.posts || [];
-      
-      container.innerHTML = posts.map(post => `
-        <div class="post">
-          <div class="meta">
-            <span>${post.author} • ${formatDate(post.createdAt)}</span>
-            <span>👍 ${post.upvotes}</span>
-          </div>
-          <div style="margin-top:8px">${post.content}</div>
-          ${post.replies && post.replies.length > 0 ? `
-            <div class="reply-list">
-              ${post.replies.map(reply => `
-                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eef6fc">
-                  <div class="small" style="font-weight:600">${reply.author}</div>
-                  <div style="margin-top:4px">${reply.text}</div>
-                </div>
-              `).join('')}
+    // --- render posts ---
+    function renderPosts(posts){
+      postsContainer.innerHTML = '';
+      if(!posts || posts.length===0){
+        postsContainer.innerHTML = `<div class="small">Belum ada postingan di grup ini. Ajak teman untuk berdiskusi!</div>`;
+        return;
+      }
+      posts.slice().reverse().forEach(post=>{
+        const el = document.createElement('div');
+        el.className = 'post';
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-weight:700">${escapeHtml(post.author)}</div>
+              <div class="meta">${new Date(post.time).toLocaleString()} • <span class="small">${post.title || 'Pertanyaan'}</span></div>
             </div>
-          ` : ''}
-          <div style="margin-top:8px">
-            <button class="btn secondary" style="font-size:12px;padding:4px 8px" onclick="upvotePost('${post.id}')">👍 Upvote</button>
-            <button class="btn secondary" style="font-size:12px;padding:4px 8px" onclick="showReplyInput('${post.id}')">💬 Balas</button>
+            <div class="small" style="color:var(--muted)">${post.upvotes || 0} 👍</div>
           </div>
-        </div>
-      `).join('');
-    }
-
-    function renderProfile() {
-      if (!currentUser) return;
-      
-      document.getElementById('profileName').textContent = currentUser.name;
-      document.getElementById('profileEmail').textContent = currentUser.email || 'Belum ada email';
-      document.getElementById('profileBio').textContent = currentUser.bio || 'Belum ada bio';
-      document.getElementById('profileAvatarLarge').textContent = currentUser.name.charAt(0).toUpperCase();
-      
-      document.getElementById('profileEmailInput').value = currentUser.email || '';
-      document.getElementById('profileBioInput').value = currentUser.bio || '';
-      
-      // Calculate stats
-      const userGroups = groups.filter(g => g.members.includes(currentUser.id));
-      const userPosts = groups.reduce((acc, g) => acc + (g.posts?.filter(p => p.author === currentUser.name).length || 0), 0);
-      
-      document.getElementById('statGroups').textContent = userGroups.length;
-      document.getElementById('statPosts').textContent = userPosts;
-      
-      // Render user groups
-      const groupsContainer = document.getElementById('userGroupsList');
-      if (userGroups.length > 0) {
-        groupsContainer.innerHTML = userGroups.map(group => `
-          <div class="profile-list-item">
-            <div class="profile-list-item-title">${group.name}</div>
-            <div class="profile-list-item-meta">${group.subject} • ${group.members.length} anggota</div>
+          <div style="margin-top:8px">${escapeHtml(post.content).replace(/\n/g,'<br>')}</div>
+          <div class="reply-list" id="replies-${post.id}">
+            ${post.replies && post.replies.length ? post.replies.map(r => `<div style="background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #eef6fb"><strong>${escapeHtml(r.author)}</strong> <div class="small">${new Date(r.time).toLocaleString()}</div><div style="margin-top:6px">${escapeHtml(r.text)}</div></div>`).join('') : ''}
           </div>
-        `).join('');
-      } else {
-        groupsContainer.innerHTML = '<div class="small">Belum bergabung dengan grup mana pun</div>';
-      }
-    }
-
-    function renderQuizCategories() {
-      const container = document.getElementById('quizCategories');
-      const subjects = DATA_BY_LEVEL.sma.subjects;
-      
-      container.innerHTML = '<div class="quiz-category active" data-category="all">Semua</div>' +
-        subjects.map(subject => `
-          <div class="quiz-category" data-category="${subject.name.toLowerCase()}">${subject.name}</div>
-        `).join('');
-      
-      // Add click handlers
-      container.querySelectorAll('.quiz-category').forEach(cat => {
-        cat.addEventListener('click', () => {
-          container.querySelectorAll('.quiz-category').forEach(c => c.classList.remove('active'));
-          cat.classList.add('active');
-          quizState.category = cat.dataset.category;
-          renderQuizContent();
-        });
-      });
-    }
-
-    function renderQuizContent() {
-      const container = document.getElementById('quizContent');
-      const allQuestions = [];
-      
-      Object.entries(DATA_BY_LEVEL.sma.quizQuestions).forEach(([subject, questions]) => {
-        if (quizState.category === 'all' || subject === quizState.category) {
-          questions.forEach(q => {
-            allQuestions.push({ ...q, subject });
-          });
-        }
-      });
-      
-      quizState.questions = allQuestions.slice(0, 5); // Limit to 5 questions
-      quizState.answers = new Array(quizState.questions.length).fill(null);
-      
-      container.innerHTML = quizState.questions.map((q, i) => `
-        <div style="margin-bottom:16px">
-          <div style="font-weight:600;margin-bottom:8px">${q.q}</div>
-          ${q.a.map((ans, j) => `
-            <label style="display:block;margin-bottom:4px">
-              <input type="radio" name="q${i}" value="${j}" onchange="quizState.answers[${i}] = ${j}">
-              ${ans}
-            </label>
-          `).join('')}
-        </div>
-      `).join('');
-    }
-
-    function submitQuiz() {
-      if (!currentUser) return;
-      
-      let score = 0;
-      quizState.questions.forEach((q, i) => {
-        if (quizState.answers[i] === q.correct) score++;
-      });
-      
-      const percentage = Math.round((score / quizState.questions.length) * 100);
-      document.getElementById('quizResult').textContent = `Skor: ${score}/${quizState.questions.length} (${percentage}%)`;
-      
-      // Show detailed results
-      const detailsContainer = document.getElementById('quizResultDetails');
-      detailsContainer.style.display = 'block';
-      detailsContainer.innerHTML = quizState.questions.map((q, i) => `
-        <div class="quiz-result-item">
-          <div class="quiz-result-icon ${quizState.answers[i] === q.correct ? 'correct' : 'incorrect'}">
-            ${quizState.answers[i] === q.correct ? '✓' : '✗'}
-          </div>
-          <div class="quiz-result-content">
-            <div class="quiz-result-question">${q.q}</div>
-            <div class="quiz-result-answer ${quizState.answers[i] === q.correct ? 'correct' : 'incorrect'}">
-              Jawabanmu: ${q.a[quizState.answers[i]] || 'Tidak dijawab'}
-            </div>
-            ${quizState.answers[i] !== q.correct ? `
-              <div class="quiz-result-answer correct">
-                Jawaban benar: ${q.a[q.correct]}
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-      
-      // Save score
-      if (currentUser) {
-        const quizScore = {
-          category: quizState.category,
-          score: score,
-          total: quizState.questions.length,
-          percentage: percentage,
-          date: new Date()
-        };
-        
-        let scores = JSON.parse(localStorage.getItem(STORAGE_QUIZ_SCORES) || '[]');
-        scores.push(quizScore);
-        localStorage.setItem(STORAGE_QUIZ_SCORES, JSON.stringify(scores));
-      }
-    }
-
-    function renderLeaderboard() {
-      const container = document.getElementById('leaderboardContent');
-      const scores = JSON.parse(localStorage.getItem(STORAGE_QUIZ_SCORES) || '[]');
-      
-      // Group scores by user and calculate averages
-      const userScores = {};
-      scores.forEach(score => {
-        if (!userScores[score.user]) {
-          userScores[score.user] = [];
-        }
-        userScores[score.user].push(score);
-      });
-      
-      const leaderboard = Object.entries(userScores)
-        .map(([user, scores]) => ({
-          user: user,
-          avgScore: Math.round(scores.reduce((acc, s) => acc + s.percentage, 0) / scores.length),
-          totalQuizzes: scores.length
-        }))
-        .sort((a, b) => b.avgScore - a.avgScore)
-        .slice(0, 10);
-      
-      if (leaderboard.length === 0) {
-        container.innerHTML = `
-          <div class="empty-leaderboard">
-            <div class="empty-leaderboard-icon">🏆</div>
-            <div>Belum ada data peringkat</div>
-            <div class="small">Kerjakan kuis untuk masuk ke papan peringkat!</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input placeholder="Tulis balasan..." class="input" id="reply-input-${post.id}" />
+            <button class="btn secondary" onclick="handleReply('${post.id}')">Kirim</button>
+            <button class="btn" onclick="handleUpvote('${post.id}')">👍 Upvote</button>
           </div>
         `;
-        return;
-      }
-      
-      container.innerHTML = `
-        <ul class="leaderboard-list">
-          ${leaderboard.map((entry, index) => `
-            <li class="leaderboard-item">
-              <div class="leaderboard-rank">
-                ${index < 3 ? `<div class="rank-medal rank-${index + 1}">${index + 1}</div>` : index + 1}
-              </div>
-              <div class="leaderboard-info">
-                <div class="leaderboard-name">${entry.user}</div>
-                <div class="leaderboard-meta">${entry.totalQuizzes} kuis • Rata-rata ${entry.avgScore}%</div>
-              </div>
-              <div class="leaderboard-score">${entry.avgScore}%</div>
-            </li>
-          `).join('')}
-        </ul>
-      `;
+        postsContainer.appendChild(el);
+      });
     }
 
-    function renderNotifications() {
-      const container = document.getElementById('notificationList');
-      const notifications = JSON.parse(localStorage.getItem(STORAGE_NOTIFICATIONS) || '[]');
-      
-      if (notifications.length === 0) {
-        container.innerHTML = '<div class="small" style="padding:16px;text-align:center">Tidak ada notifikasi</div>';
-        return;
-      }
-      
-      container.innerHTML = notifications.map(notif => `
-        <div class="notification-item ${notif.read ? '' : 'unread'}">
-          <div>${notif.message}</div>
-          <div class="notification-time">${formatDate(notif.date)}</div>
-        </div>
-      `).join('');
+    // --- make new group ---
+    function createGroup(name, jenjang, subject){
+      const g = { id: genId(), name: name || ('Grup ' + Math.floor(Math.random()*100)), jenjang: jenjang || currentJenjang, subject: subject || JENJANG_CONFIG[currentJenjang].subjects[0].name, members: [], posts: [] };
+      groups.push(g);
+      saveData(groups);
+      renderGroupList();
+      return g;
     }
 
-    // --- Helper functions ---
-    window.upvotePost = function(postId) {
-      if (currentGroup && currentUser) {
-        const post = currentGroup.posts.find(p => p.id === postId);
-        if (post) {
-          post.upvotes++;
-          saveData(groups);
-          renderPosts();
-        }
-      }
-    };
+    // --- post to group ---
+    function postToGroup(groupId, title, content){
+      const g = groups.find(x=>x.id===groupId);
+      if(!g) return;
+      const post = { id: genId(), author: currentUser||'Anonim', title: title||'', content: content||'', time: Date.now(), upvotes:0, replies:[] };
+      g.posts = g.posts || [];
+      g.posts.push(post);
+      saveData(groups);
+      renderPosts(g.posts);
+    }
 
-    window.showReplyInput = function(postId) {
-      if (!currentUser) {
-        showLoginModal();
+    // --- reply handler ---
+    window.handleReply = function(postId){
+      const input = document.getElementById('reply-input-'+postId);
+      if(!input) return;
+      const text = input.value.trim();
+      if(!text) return alert('Isi balasan dulu.');
+      const g = groups.find(x=>x.id===currentGroupId);
+      if(!g) return;
+      const p = g.posts.find(pp=>pp.id===postId);
+      if(!p) return;
+      p.replies = p.replies || [];
+      p.replies.push({ id: genId(), author: currentUser||'Anonim', text, time: Date.now() });
+      saveData(groups);
+      renderPosts(g.posts);
+    }
+
+    // --- upvote handler ---
+    window.handleUpvote = function(postId){
+      const g = groups.find(x=>x.id===currentGroupId);
+      if(!g) return;
+      const p = g.posts.find(pp=>pp.id===postId);
+      if(!p) return;
+      p.upvotes = (p.upvotes || 0) + 1;
+      saveData(groups);
+      renderPosts(g.posts);
+    }
+
+    // --- QUIZ FUNCTIONS ---
+    function openQuizForGroup(groupId) {
+      const g = groups.find(x=>x.id===groupId);
+      if (!g) return;
+
+      quizTitle.textContent = `Latihan Soal: ${g.subject}`;
+      quizDesc.textContent = `Soal acak untuk jenjang ${g.jenjang}`;
+      modalQuiz.style.display = 'flex';
+      quizContent.innerHTML = '<div class="small">Memuat soal...</div>';
+      quizResult.textContent = '';
+
+      // Get questions from the local bank
+      const questionsForSubject = QUESTIONS_BANK[g.jenjang]?.[g.subject] || [];
+      if (questionsForSubject.length === 0) {
+        quizContent.innerHTML = '<div class="small">Belum ada soal untuk mata pelajaran ini.</div>';
         return;
       }
-      
-      const replyText = prompt('Tulis balasan:');
-      if (replyText && currentGroup) {
-        const post = currentGroup.posts.find(p => p.id === postId);
-        if (post) {
-          if (!post.replies) post.replies = [];
-          post.replies.push({
-            id: genId(),
-            author: currentUser.name,
-            text: replyText,
-            date: new Date()
-          });
-          saveData(groups);
-          renderPosts();
-        }
-      }
-    };
 
-    // --- Start the app ---
-    document.addEventListener('DOMContentLoaded', initApp);
+      // Take 3 random questions
+      currentQuizQuestions = shuffleArray(questionsForSubject).slice(0, 3);
+      renderQuiz();
+    }
+
+    function renderQuiz(){
+      quizContent.innerHTML = '';
+      currentQuizQuestions.forEach((it, idx)=>{
+        const div = document.createElement('div');
+        div.style.marginBottom='10px';
+        div.innerHTML = `<div style="font-weight:700">${idx + 1}. ${it.q}</div>`;
+        it.a.forEach((opt, i)=>{
+          div.innerHTML += `<div style="margin-top:6px"><label><input type="radio" name="q${idx}" value="${i}"> ${opt}</label></div>`;
+        });
+        quizContent.appendChild(div);
+      });
+      quizResult.textContent = '';
+    }
+
+    function submitQuiz(){
+      let score = 0;
+      currentQuizQuestions.forEach((it, idx)=>{
+        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (sel && Number(sel.value) === it.correct) {
+          score++;
+        }
+      });
+      quizResult.textContent = `Skor: ${score} / ${currentQuizQuestions.length}`;
+    }
+
+    // --- attach listeners ---
+    function attachListeners(){
+      btnLogin.addEventListener('click', ()=> openModal());
+      startBtn.addEventListener('click', ()=>{
+        if(!currentUser) openModal();
+        else {
+          mainArea.style.display='grid';
+          renderGroupList();
+        }
+      });
+      
+      learnMoreBtn.addEventListener('click', () => {
+        alert('Fitur StudyPal:\n\n1. Forum Diskusi - Tanya jawab & solusi soal antar siswa\n2. Grup Belajar - Buat grup sesuai kelas atau topik\n3. Latihan Soal - Soal acak untuk setiap mata pelajaran\n4. Multi Jenjang - Dari SD hingga SMA dengan mata pelajaran yang berbeda');
+      });
+      
+      modalCancel.addEventListener('click', ()=> closeModal());
+      modalSave.addEventListener('click', ()=>{
+        const name = inputName.value.trim();
+        const jenjang = inputJenjang.value;
+        if(!name) return alert('Isi nama dulu.');
+        if(!jenjang) return alert('Pilih jenjang pendidikan.');
+        currentUser = name;
+        currentUserJenjang = jenjang;
+        currentJenjang = jenjang;
+        localStorage.setItem(STORAGE_USER, currentUser);
+        localStorage.setItem('studypal_jenjang', currentUserJenjang);
+        closeModal();
+        refreshUserUI();
+        document.getElementById('startBtn').textContent = 'Buka Dashboard';
+        renderJenjangSelector();
+        renderSubjectQuick();
+        updateSubjectSelect();
+      });
+
+      btnCreateGroup.addEventListener('click', ()=>{
+        const name = newGroupName.value.trim();
+        const subject = newGroupSubject.value;
+        if(!name) return alert('Masukkan nama grup.');
+        const g = createGroup(name, currentJenjang, subject);
+        newGroupName.value='';
+        openGroup(g.id);
+      });
+
+      btnPost.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const text = postText.value.trim();
+        if(!text) return alert('Tulis pertanyaan atau catatan terlebih dahulu.');
+        postToGroup(currentGroupId, '', text);
+        postText.value='';
+      });
+      btnClearPost.addEventListener('click', ()=> postText.value='');
+
+      btnJoin.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const g = groups.find(x=>x.id===currentGroupId);
+        if(!g) return;
+        if(!g.members.includes(currentUser)) g.members.push(currentUser);
+        saveData(groups);
+        openGroup(g.id);
+      });
+      btnLeave.addEventListener('click', ()=>{
+        if(!currentUser) return openModal();
+        const g = groups.find(x=>x.id===currentGroupId);
+        if(!g) return;
+        g.members = g.members.filter(m=>m!==currentUser);
+        saveData(groups);
+        openGroup(g.id);
+      });
+
+      // Quiz listeners
+      btnQuiz.addEventListener('click', () => {
+        if(currentGroupId) {
+          openQuizForGroup(currentGroupId);
+        } else {
+          alert('Silakan pilih grup terlebih dahulu untuk mengakses kuis.');
+        }
+      });
+      
+      btnQuizSubject.addEventListener('click', () => {
+        if(currentGroupId) {
+          openQuizForGroup(currentGroupId);
+        } else {
+          alert('Silakan pilih grup terlebih dahulu untuk mengakses kuis.');
+        }
+      });
+      
+      quizClose.addEventListener('click', ()=> modalQuiz.style.display='none');
+      quizSubmit.addEventListener('click', submitQuiz);
+    }
+
+    // --- modal functions ---
+    function openModal(){
+      modal.style.display='flex';
+      inputName.value = currentUser || '';
+      inputJenjang.value = currentUserJenjang || '';
+      inputName.focus();
+    }
+    function closeModal(){ modal.style.display='none' }
+
+    // --- escape html ---
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // init app
+    init();
+    updateSubjectSelect();
+
+    // expose for debugging (optional)
+    window.__studypal = { groups, saveData, loadData };
   </script>
+<footer style="background-color:#0d47a1;color:white;text-align:center;padding:20px 10px;margin-top:40px;">
+  <h3>StudyPal Official</h3>
+  <p>📍 Desa Bungur, Kecamatan Tulakan, Kabupaten Pacitan, Jawa TImur | 📧 support@studypal.id</p>
+  <div style="margin-top:10px;">
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">Instagram</a> |
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">YouTube</a> |
+    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">TikTok</a>
+  </div>
+  <p style="font-size:13px;color:#cfe2f5;margin-top:10px;">© 2025 StudyPal • Semua Hak Dilindungi</p>
+</footer>
 </body>
 </html>
