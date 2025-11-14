@@ -1,933 +1,3192 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StudyPal — Platform Belajar Kolaboratif (Prototype)</title>
-  <style>
-    /* ===== Global styles ===== */
-    :root{
-      --bg:#f6fbff;
-      --card:#ffffff;
-      --primary:#0b6fb6; /* main blue */
-      --primary-600:#075691;
-      --muted:#6b7b8c;
-      --accent:#e8f4ff;
-      --glass: rgba(255,255,255,0.6);
-      --radius:12px;
-      --shadow: 0 6px 18px rgba(11,111,182,0.08);
-      --mono: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:var(--mono);
-      background: linear-gradient(180deg, var(--bg) 0%, #f1f7fc 100%);
-      color:#16324f;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding-bottom:60px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPal - Belajar Jadi Lebih Mudah</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4ea3ff;
+            --secondary-color: #8e44ad;
+            --accent-color: #16a085;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --dark-bg: #1a1a2e;
+            --dark-card: #16213e;
+            --dark-text: #eaeaea;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-    /* ===== Header ===== */
-    header{
-      position:sticky;
-      top:0;
-      backdrop-filter: blur(6px);
-      background: rgba(255,255,255,0.6);
-      border-bottom:1px solid #e6eef8;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:12px 20px;
-      z-index:50;
-    }
-    .brand{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .logo{
-      width:44px;height:44px;
-      border-radius:10px;
-      background:linear-gradient(135deg,var(--primary),var(--primary-600));
-      display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
-      font-size:18px;box-shadow:var(--shadow);
-    }
-    .brand h1{margin:0;font-size:18px}
-    nav{display:flex;gap:10px;align-items:center}
-    .btn{
-      padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600;
-      background:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(11,111,182,0.12)
-    }
-    .btn.secondary{
-      background:transparent;color:var(--primary);border:1px solid rgba(11,111,182,0.12);
-      box-shadow:none;font-weight:600;
-    }
-    .user-chip{display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(11,111,182,0.06);color:var(--primary);font-weight:600}
-    .small{font-size:13px;color:var(--muted)}
-    .jenjang-selector {
-      display: flex;
-      gap: 8px;
-      margin: 12px 0;
-    }
-    .jenjang-btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid #e6eef8;
-      background: white;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .jenjang-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* ===== Hero ===== */
-    .container{max-width:1100px;margin:28px auto;padding:0 18px}
-    .hero{
-      display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:center;
-    }
-    .hero-card{
-      background:var(--card);padding:28px;border-radius:16px;box-shadow:var(--shadow);
-    }
-    .hero h2{margin:0 0 6px;font-size:24px}
-    .hero p{margin:0 0 16px;color:var(--muted)}
-    .hero-actions{display:flex;gap:12px;align-items:center}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            transition: var(--transition);
+        }
 
-    /* ===== Dashboard cards ===== */
-    .grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px;
-    }
-    .card{
-      background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);
-    }
-    .subject{
-      display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid #f1f6fb;
-    }
-    .subject .icon{
-      width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
-    }
-    .s-math{background:linear-gradient(135deg,#0b6fb6,#3aa0ff)}
-    .s-phys{background:linear-gradient(135deg,#ff8a65,#ffb86b)}
-    .s-bio{background:linear-gradient(135deg,#4caf50,#8bdc91)}
-    .s-eng{background:linear-gradient(135deg,#9c27b0,#c18ce8)}
-    .s-indo{background:linear-gradient(135deg,#f44336,#ff6659)}
-    .s-ips{background:linear-gradient(135deg,#ff9800,#ffb74d)}
-    .s-kimia{background:linear-gradient(135deg,#00bcd4,#4dd0e1)}
-    .s-eko{background:linear-gradient(135deg,#795548,#a1887f)}
-    .s-geo{background:linear-gradient(135deg,#4caf50,#81c784)}
-    .s-sej{background:linear-gradient(135deg,#3f51b5,#5c6bc0)}
-    .s-sos{background:linear-gradient(135deg,#e91e63,#f06292)}
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
 
-    /* ===== Group & forum view ===== */
-    .layout{
-      display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px;
-    }
-    .sidebar{
-      position:sticky;top:84px;align-self:start;
-    }
-    .group-list{display:flex;flex-direction:column;gap:10px}
-    .group-item{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6fc;cursor:pointer}
-    .group-item.active{border:2px solid var(--primary);box-shadow:0 8px 20px rgba(11,111,182,0.06)}
-    .new-group{display:flex;gap:8px;margin-top:12px}
-    .input{padding:10px;border-radius:10px;border:1px solid #e6eef8;flex:1}
-    select.input { cursor: pointer; }
+        body.dark-mode .card,
+        body.dark-mode .navbar,
+        body.dark-mode .footer {
+            background-color: var(--dark-card);
+            color: var(--dark-text);
+        }
 
-    /* forum */
-    .forum{
-      display:flex;flex-direction:column;gap:12px;
-    }
-    .post{
-      padding:12px;border-radius:10px;background:var(--card);border:1px solid #eef6fb;box-shadow:var(--shadow);
-    }
-    .post .meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
-    .reply-list{margin-top:8px;display:flex;flex-direction:column;gap:8px;padding-left:8px}
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: #2c3e50;
+            color: var(--dark-text);
+            border-color: #34495e;
+        }
 
-    /* footer */
-    footer{display:flex;justify-content:center;padding:18px;margin-top:30px;color:var(--muted)}
+        body.dark-mode .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
 
-    /* modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(6,20,36,0.36);display:none;align-items:center;justify-content:center;z-index:90}
-    .modal{background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:640px;box-shadow:0 16px 40px rgba(6,20,36,0.18)}
-    .modal.show{display:block}
+        body.dark-mode .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
-    /* responsive */
-    @media (max-width:880px){
-      .hero{grid-template-columns:1fr;gap:14px}
-      .layout{grid-template-columns:1fr;align-items:start}
-      .sidebar{position:static}
-    }
-  </style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--light-bg);
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .xp-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* Enhanced Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-text {
+            text-align: left;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--white);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .floating-element {
+            position: absolute;
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 50%;
+            right: -15%;
+            animation-delay: 1s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 10%;
+            right: -5%;
+            animation-delay: 2s;
+        }
+
+        .floating-element i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .card p {
+            color: #666;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 4rem 0;
+            background-color: var(--white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .author-info h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Subject Materials */
+        .subjects {
+            padding: 4rem 0;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .subject-card h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Practice Questions */
+        .practice-container {
+            padding: 4rem 0;
+        }
+
+        .question-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .question-difficulty {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .difficulty-easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(78, 163, 255, 0.1);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 1rem;
+        }
+
+        .submit-btn {
+            margin-top: 2rem;
+        }
+
+        .explanation {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            border-left: 5px solid var(--accent-color);
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        /* Study Groups */
+        .groups-container {
+            padding: 4rem 0;
+        }
+
+        .groups-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .group-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .group-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .group-members {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        .group-description {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+
+        .group-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            padding: 0.2rem 0.5rem;
+            background-color: var(--light-bg);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .join-btn {
+            width: 100%;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-title {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Study Planner */
+        .planner-container {
+            padding: 4rem 0;
+        }
+
+        .planner-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .todo-list {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .todo-items {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .todo-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .todo-checkbox {
+            margin-right: 1rem;
+        }
+
+        .todo-text {
+            flex: 1;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .todo-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            transition: var(--transition);
+        }
+
+        .todo-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+        }
+
+        .schedule-day {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .day-schedule {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .schedule-item {
+            padding: 0.5rem;
+            background-color: var(--light-bg);
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Forum */
+        .forum-container {
+            padding: 4rem 0;
+        }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .forum-posts {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .forum-post {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .post-author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .post-author-info h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .post-author-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            transition: var(--transition);
+        }
+
+        .post-action:hover {
+            color: var(--primary-color);
+        }
+
+        .post-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-responses {
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .response {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .response-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .response-content {
+            flex: 1;
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-author {
+            font-weight: bold;
+        }
+
+        .response-time {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .response-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .response-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .response-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* About */
+        .about-container {
+            padding: 4rem 0;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .about-image {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .about-image img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .team {
+            margin-top: 4rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-member {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+
+        .member-name {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-role {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .member-social {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        /* Login Modal */
+        .login-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: var(--transition);
+        }
+
+        .login-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .login-content {
+            display: none;
+        }
+
+        .login-content.active {
+            display: block;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+        }
+
+        .google-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #e0e0e0;
+        }
+
+        .divider span {
+            background-color: white;
+            padding: 0 1rem;
+            position: relative;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100%;
+                background-color: var(--white);
+                z-index: 1000;
+                transition: var(--transition);
+                padding: 2rem;
+                overflow-y: auto;
+            }
+
+            .mobile-menu.show {
+                left: 0;
+            }
+
+            .mobile-menu-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 2rem;
+            }
+
+            .mobile-menu-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .mobile-nav-links {
+                list-style: none;
+            }
+
+            .mobile-nav-links li {
+                margin-bottom: 1rem;
+            }
+
+            .mobile-nav-links a {
+                color: var(--text-color);
+                text-decoration: none;
+                font-size: 1.1rem;
+                display: block;
+                padding: 0.5rem 0;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text {
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .features-grid,
+            .testimonials-grid,
+            .groups-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .subjects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .post-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .forum-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .response-form {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        .mt-2 {
+            margin-top: 2rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 2rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-    <div class="logo" style="background:none;box-shadow:none;padding:0;">
-  <img src="https://iili.io/Kslta2e.png" alt="StudyPal Logo" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">
-</div>
-
-      <div>
-        <h1>StudyPal</h1>
-        <div class="small">Belajar kolaboratif untuk semua jenjang</div>
-      </div>
-    </div>
-    <nav>
-      <button class="btn" id="btn-quiz">Kuis Cepat</button>
-      <button class="btn secondary" id="btn-login">Login / Register</button>
-      <div id="userArea" style="display:none" class="user-chip"></div>
-    </nav>
-  </header>
-
-  <main class="container" id="app">
-    <!-- Hero -->
-    <section class="hero-card hero">
-      <div>
-        <h2>Belajar lebih mudah bersama teman — kapan saja, di mana saja</h2>
-        <p>StudyPal membantu siswa dari SD hingga SMA membentuk grup belajar, berdiskusi, dan latihan soal interaktif. Cocok untuk tugas kelompok & persiapan ujian.</p>
-        <p class="small" style="color: var(--primary-600); font-style: italic;">*Saat ini masih dalam tahap pengembangan.</p>
-        <div class="hero-actions">
-          <button class="btn" id="startBtn">Mulai Belajar Sekarang</button>
-          <button class="btn secondary" id="learnMore">Lihat Fitur</button>
-        </div>
-
-        <!-- Highlights -->
-        <div class="grid" style="margin-top:18px">
-          <div class="card">
-            <strong>Forum Diskusi</strong>
-            <div class="small" style="margin-top:6px">Tanya jawab & solusi soal antar siswa.</div>
-          </div>
-          <div class="card">
-            <strong>Grup Belajar</strong>
-            <div class="small" style="margin-top:6px">Buat grup sesuai kelas atau topik.</div>
-          </div>
-          <div class="card">
-            <strong>Latihan Soal</strong>
-            <div class="small" style="margin-top:6px">Soal acak untuk setiap mata pelajaran.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- right card: quick access -->
-      <aside class="hero-card" style="text-align:center">
-        <h3 style="margin-bottom:6px">Dashboard Cepat</h3>
-        <p class="small">Pilih jenjang dan mata pelajaran untuk mulai bergabung di grup & berdiskusi</p>
-        
-        <!-- Jenjang Selector -->
-        <div class="jenjang-selector" id="jenjangSelector">
-          <button class="jenjang-btn active" data-jenjang="SD">SD</button>
-          <button class="jenjang-btn" data-jenjang="SMP">SMP</button>
-          <button class="jenjang-btn" data-jenjang="SMA">SMA</button>
-        </div>
-        
-        <div style="margin-top:12px" id="subjectQuick"></div>
-      </aside>
-    </section>
-
-    <!-- Main layout: sidebar groups + forum -->
-    <section id="mainArea" style="display:none" class="layout">
-      <div class="sidebar card">
-        <h3 style="margin:0 0 8px 0">Grup Study</h3>
-        <div class="small">Pilih grup atau buat yang baru</div>
-        <div id="groupList" class="group-list" style="margin-top:12px"></div>
-
-        <div class="new-group">
-          <input id="newGroupName" class="input" placeholder="Nama grup (contoh: Kelas 11 IPA 1)"/>
-          <select id="newGroupSubject" class="input" style="flex:0.8">
-            <!-- Options will be populated dynamically -->
-          </select>
-          <button class="btn" id="btnCreateGroup">Buat</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div id="groupHeader">
-          <h2 style="margin:0">Pilih Grup</h2>
-          <div class="small">Gabung ke grup untuk melihat forum</div>
-        </div>
-
-        <div id="forumArea" style="margin-top:12px;display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <h3 id="groupTitle" style="margin:0">Group Title</h3>
-              <div class="small" id="groupMeta">Mata pelajaran • 0 anggota</div>
-            </div>
-            <div>
-              <button class="btn secondary" id="btnLeave">Keluar</button>
-              <button class="btn" id="btnJoin">Gabung</button>
-              <button class="btn secondary" id="btnQuizSubject" style="margin-left: 8px;">Latihan Soal</button>
-            </div>
-          </div>
-
-          <!-- Post composer -->
-          <div style="margin-top:12px" class="post">
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700" id="avatarInitial">A</div>
-              <div style="flex:1">
-                <textarea id="postText" rows="3" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eef6fb;resize:vertical" placeholder="Tulis pertanyaan atau catatan..."></textarea>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                  <div class="small">Tambahkan gambar atau link (opsional)</div>
-                  <div>
-                    <button class="btn secondary" id="btnClearPost">Bersihkan</button>
-                    <button class="btn" id="btnPost">Kirim</button>
-                  </div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                StudyPal
+            </a>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-page="home">Beranda</a></li>
+                <li><a href="#" class="nav-link" data-page="materials">Materi Pelajaran</a></li>
+                <li><a href="#" class="nav-link" data-page="practice">Latihan Soal</a></li>
+                <li><a href="#" class="nav-link" data-page="groups">Grup Belajar</a></li>
+                <li><a href="#" class="nav-link" data-page="planner">Planner</a></li>
+                <li><a href="#" class="nav-link" data-page="forum">Forum</a></li>
+                <li><a href="#" class="nav-link" data-page="about">Tentang</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar">G</div>
+                    <span class="xp-badge">0 XP</span>
                 </div>
-              </div>
+                <button class="btn btn-outline-primary" id="loginBtn">Masuk</button>
             </div>
-          </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
 
-          <!-- Post list -->
-          <div id="postsContainer" style="margin-top:12px"></div>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <a href="#" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                StudyPal
+            </a>
+            <button class="mobile-menu-close" id="mobileMenuClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="#" class="mobile-nav-link active" data-page="home">Beranda</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="materials">Materi Pelajaran</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="practice">Latihan Soal</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="groups">Grup Belajar</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="planner">Planner</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="forum">Forum</a></li>
+            <li><a href="#" class="mobile-nav-link" data-page="about">Tentang</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <!-- Enhanced Hero Section -->
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1>Belajar Jadi Lebih Mudah dengan StudyPal</h1>
+                            <p class="subtitle">Platform belajar gratis untuk siswa SMA dengan materi lengkap, latihan soal, dan fitur kolaborasi yang menarik</p>
+                            <div class="hero-buttons">
+                                <a href="#" class="btn" id="startLearningBtn">Mulai Belajar</a>
+                                <a href="#" class="btn btn-outline" id="watchDemoBtn">Lihat Demo</a>
+                            </div>
+                            <div class="hero-stats">
+                                <div class="stat-item">
+                                    <span class="stat-number">50K+</span>
+                                    <span class="stat-label">Siswa Aktif</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">1000+</span>
+                                    <span class="stat-label">Materi Pelajaran</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">10K+</span>
+                                    <span class="stat-label">Latihan Soal</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <img src="https://picsum.photos/seed/studypal-hero/500/400.jpg" alt="StudyPal Hero" class="hero-image">
+                            <div class="floating-elements">
+                                <div class="floating-element">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="floating-element">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="floating-element">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features">
+                <div class="container">
+                    <h2 class="section-title">Fitur Utama StudyPal</h2>
+                    <div class="features-grid">
+                        <div class="card fade-in">
+                            <div class="card-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <h3>Latihan Soal</h3>
+                            <p>Berbagai latihan soal untuk semua mata pelajaran SMA dengan pembahasan lengkap</p>
+                        </div>
+                        <div class="card fade-in">
+                            <div class="card-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h3>Materi Ringkas</h3>
+                            <p>Rangkuman materi pelajaran yang mudah dipahami dengan contoh dan video pembelajaran</p>
+                        </div>
+                        <div class="card fade-in">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Grup Belajar</h3>
+                            <p>Bergabung dengan grup belajar untuk diskusi dan berbagi catatan dengan teman</p>
+                        </div>
+                        <div class="card fade-in">
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h3>Planner</h3>
+                            <p>Atur jadwal belajar dan tugas sekolah dengan planner yang mudah digunakan</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="testimonials">
+                <div class="container">
+                    <h2 class="section-title">Apa Kata Siswa?</h2>
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card">
+                            <p class="testimonial-text">"StudyPal sangat membantu saya dalam memahami materi pelajaran yang sulit. Saya jadi lebih siap menghadapi ujian!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">A</div>
+                                <div class="author-info">
+                                    <h4>Andi Pratama</h4>
+                                    <p>Siswa Kelas XII IPA</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <p class="testimonial-text">"Fitur grup belajar di StudyPal memungkinkan saya untuk belajar bersama teman-teman meskipun kita jauh."</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">S</div>
+                                <div class="author-info">
+                                    <h4>Siti Nurhaliza</h4>
+                                    <p>Siswa Kelas XI IPS</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <p class="testimonial-text">"Saya suka dengan latihan soal di StudyPal karena ada pembahasannya yang jelas. Belajar jadi lebih efektif!"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">B</div>
+                                <div class="author-info">
+                                    <h4>Budi Santoso</h4>
+                                    <p>Siswa Kelas X IPA</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-      </div>
-    </section>
+        <!-- Materials Page -->
+        <div id="materialsPage" class="page hidden">
+            <section class="subjects">
+                <div class="container">
+                    <h2 class="section-title">Materi Pelajaran SMA</h2>
+                    <div class="subjects-grid">
+                        <div class="subject-card" data-subject="math">
+                            <div class="subject-icon" style="color: #3498db;">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3>Matematika</h3>
+                            <p>Aljabar, Geometri, Kalkulus</p>
+                        </div>
+                        <div class="subject-card" data-subject="physics">
+                            <div class="subject-icon" style="color: #e74c3c;">
+                                <i class="fas fa-atom"></i>
+                            </div>
+                            <h3>Fisika</h3>
+                            <p>Mekanika, Listrik, Gelombang</p>
+                        </div>
+                        <div class="subject-card" data-subject="chemistry">
+                            <div class="subject-icon" style="color: #2ecc71;">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <h3>Kimia</h3>
+                            <p>Struktur Atom, Reaksi Kimia</p>
+                        </div>
+                        <div class="subject-card" data-subject="biology">
+                            <div class="subject-icon" style="color: #16a085;">
+                                <i class="fas fa-dna"></i>
+                            </div>
+                            <h3>Biologi</h3>
+                            <p>Sel, Genetika, Ekosistem</p>
+                        </div>
+                        <div class="subject-card" data-subject="indonesian">
+                            <div class="subject-icon" style="color: #f39c12;">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3>Bahasa Indonesia</h3>
+                            <p>Teks, Sastra, Tatabahasa</p>
+                        </div>
+                        <div class="subject-card" data-subject="english">
+                            <div class="subject-icon" style="color: #9b59b6;">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <h3>Bahasa Inggris</h3>
+                            <p>Grammar, Reading, Writing</p>
+                        </div>
+                        <div class="subject-card" data-subject="economics">
+                            <div class="subject-icon" style="color: #1abc9c;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Ekonomi</h3>
+                            <p>Mikroekonomi, Makroekonomi</p>
+                        </div>
+                        <div class="subject-card" data-subject="sociology">
+                            <div class="subject-icon" style="color: #e67e22;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Sosiologi</h3>
+                            <p>Struktur Sosial, Perubahan Sosial</p>
+                        </div>
+                        <div class="subject-card" data-subject="geography">
+                            <div class="subject-icon" style="color: #34495e;">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3>Geografi</h3>
+                            <p>Lingkungan, Peta, Wilayah</p>
+                        </div>
+                        <div class="subject-card" data-subject="history">
+                            <div class="subject-icon" style="color: #c0392b;">
+                                <i class="fas fa-landmark"></i>
+                            </div>
+                            <h3>Sejarah</h3>
+                            <p>Sejarah Indonesia, Dunia</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-    <footer>
-      <div class="small">Prototype StudyPal • Dibuat untuk tugas SMA • Data tersimpan lokal di browser</div>
+            <!-- Subject Detail Modal -->
+            <div class="modal" id="subjectModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="closeSubjectModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="modal-title" id="subjectTitle">Materi Pelajaran</h2>
+                    <div class="subject-content" id="subjectContent">
+                        <div class="form-group">
+                            <label class="form-label">Pilih Bab</label>
+                            <select class="form-select" id="chapterSelect">
+                                <option value="chapter1">Bab 1: Pengenalan</option>
+                                <option value="chapter2">Bab 2: Konsep Dasar</option>
+                                <option value="chapter3">Bab 3: Aplikasi</option>
+                                <option value="chapter4">Bab 4: Latihan Soal</option>
+                            </select>
+                        </div>
+                        <div class="subject-tabs">
+                            <div class="planner-tabs">
+                                <button class="tab active" data-tab="summary">Ringkasan</button>
+                                <button class="tab" data-tab="examples">Contoh Soal</button>
+                                <button class="tab" data-tab="video">Video Pembelajaran</button>
+                            </div>
+                            <div class="tab-content active" id="summary">
+                                <h3>Ringkasan Materi</h3>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.</p>
+                            </div>
+                            <div class="tab-content" id="examples">
+                                <h3>Contoh Soal</h3>
+                                <div class="question-card">
+                                    <div class="question-text">
+                                        <p>Contoh soal 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt?</p>
+                                    </div>
+                                    <div class="options">
+                                        <div class="option">
+                                            <input type="radio" id="ex1a" name="example1">
+                                            <label for="ex1a">A. Opsi A</label>
+                                        </div>
+                                        <div class="option">
+                                            <input type="radio" id="ex1b" name="example1">
+                                            <label for="ex1b">B. Opsi B</label>
+                                        </div>
+                                        <div class="option">
+                                            <input type="radio" id="ex1c" name="example1">
+                                            <label for="ex1c">C. Opsi C</label>
+                                        </div>
+                                        <div class="option">
+                                            <input type="radio" id="ex1d" name="example1">
+                                            <label for="ex1d">D. Opsi D</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-content" id="video">
+                                <h3>Video Pembelajaran</h3>
+                                <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                                    <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practice Page -->
+        <div id="practicePage" class="page hidden">
+            <section class="practice-container">
+                <div class="container">
+                    <h2 class="section-title">Latihan Soal</h2>
+                    <div class="form-group">
+                        <label class="form-label">Pilih Mata Pelajaran</label>
+                        <select class="form-select" id="practiceSubject">
+                            <option value="math">Matematika</option>
+                            <option value="physics">Fisika</option>
+                            <option value="chemistry">Kimia</option>
+                            <option value="biology">Biologi</option>
+                            <option value="indonesian">Bahasa Indonesia</option>
+                            <option value="english">Bahasa Inggris</option>
+                            <option value="economics">Ekonomi</option>
+                            <option value="sociology">Sosiologi</option>
+                            <option value="geography">Geografi</option>
+                            <option value="history">Sejarah</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pilih Bab</label>
+                        <select class="form-select" id="practiceChapter">
+                            <option value="chapter1">Bab 1: Pengenalan</option>
+                            <option value="chapter2">Bab 2: Konsep Dasar</option>
+                            <option value="chapter3">Bab 3: Aplikasi</option>
+                            <option value="chapter4">Bab 4: Latihan Soal</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="startPracticeBtn">Mulai Latihan</button>
+
+                    <div class="questions-container" id="questionsContainer" style="margin-top: 2rem;">
+                        <div class="question-card">
+                            <div class="question-header">
+                                <span class="question-number">Soal 1</span>
+                                <span class="question-difficulty difficulty-easy">Mudah</span>
+                            </div>
+                            <div class="question-text">
+                                <p>Jika x + 5 = 12, maka nilai x adalah...</p>
+                            </div>
+                            <div class="options">
+                                <div class="option">
+                                    <input type="radio" id="q1a" name="q1">
+                                    <label for="q1a">A. 5</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q1b" name="q1">
+                                    <label for="q1b">B. 6</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q1c" name="q1">
+                                    <label for="q1c">C. 7</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q1d" name="q1">
+                                    <label for="q1d">D. 8</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary submit-btn" data-question="1">Submit Jawaban</button>
+                            <div class="explanation" id="explanation1">
+                                <h4>Pembahasan:</h4>
+                                <p>x + 5 = 12</p>
+                                <p>x = 12 - 5</p>
+                                <p>x = 7</p>
+                                <p>Jadi, jawaban yang benar adalah C. 7</p>
+                            </div>
+                        </div>
+
+                        <div class="question-card">
+                            <div class="question-header">
+                                <span class="question-number">Soal 2</span>
+                                <span class="question-difficulty difficulty-medium">Sedang</span>
+                            </div>
+                            <div class="question-text">
+                                <p>Luas segitiga dengan alas 10 cm dan tinggi 8 cm adalah...</p>
+                            </div>
+                            <div class="options">
+                                <div class="option">
+                                    <input type="radio" id="q2a" name="q2">
+                                    <label for="q2a">A. 20 cm²</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q2b" name="q2">
+                                    <label for="q2b">B. 40 cm²</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q2c" name="q2">
+                                    <label for="q2c">C. 80 cm²</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q2d" name="q2">
+                                    <label for="q2d">D. 160 cm²</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary submit-btn" data-question="2">Submit Jawaban</button>
+                            <div class="explanation" id="explanation2">
+                                <h4>Pembahasan:</h4>
+                                <p>Luas segitiga = ½ × alas × tinggi</p>
+                                <p>Luas segitiga = ½ × 10 cm × 8 cm</p>
+                                <p>Luas segitiga = 40 cm²</p>
+                                <p>Jadi, jawaban yang benar adalah B. 40 cm²</p>
+                            </div>
+                        </div>
+
+                        <div class="question-card">
+                            <div class="question-header">
+                                <span class="question-number">Soal 3</span>
+                                <span class="question-difficulty difficulty-hard">Sulit</span>
+                            </div>
+                            <div class="question-text">
+                                <p>Jika f(x) = 2x² - 3x + 5, maka nilai f(3) adalah...</p>
+                            </div>
+                            <div class="options">
+                                <div class="option">
+                                    <input type="radio" id="q3a" name="q3">
+                                    <label for="q3a">A. 14</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q3b" name="q3">
+                                    <label for="q3b">B. 17</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q3c" name="q3">
+                                    <label for="q3c">C. 20</label>
+                                </div>
+                                <div class="option">
+                                    <input type="radio" id="q3d" name="q3">
+                                    <label for="q3d">D. 23</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary submit-btn" data-question="3">Submit Jawaban</button>
+                            <div class="explanation" id="explanation3">
+                                <h4>Pembahasan:</h4>
+                                <p>f(x) = 2x² - 3x + 5</p>
+                                <p>f(3) = 2(3)² - 3(3) + 5</p>
+                                <p>f(3) = 2(9) - 9 + 5</p>
+                                <p>f(3) = 18 - 9 + 5</p>
+                                <p>f(3) = 14</p>
+                                <p>Jadi, jawaban yang benar adalah A. 14</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Groups Page -->
+        <div id="groupsPage" class="page hidden">
+            <section class="groups-container">
+                <div class="container">
+                    <div class="groups-header">
+                        <h2 class="section-title">Grup Belajar</h2>
+                        <button class="btn btn-primary" id="createGroupBtn">Buat Grup Baru</button>
+                    </div>
+                    <div class="groups-grid">
+                        <div class="group-card">
+                            <div class="group-header">
+                                <h3 class="group-title">Matematika Kelas XII</h3>
+                                <div class="group-members">
+                                    <i class="fas fa-users"></i>
+                                    <span>24 anggota</span>
+                                </div>
+                            </div>
+                            <p class="group-description">Diskusi dan belajar bersama untuk persiapan Ujian Matematika</p>
+                            <div class="group-tags">
+                                <span class="tag">Matematika</span>
+                                <span class="tag">Kelas XII</span>
+                                <span class="tag">Ujian</span>
+                            </div>
+                            <button class="btn btn-primary join-btn">Gabung Grup</button>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-header">
+                                <h3 class="group-title">Fisika IPA</h3>
+                                <div class="group-members">
+                                    <i class="fas fa-users"></i>
+                                    <span>18 anggota</span>
+                                </div>
+                            </div>
+                            <p class="group-description">Belajar konsep Fisika dan berbagi soal latihan</p>
+                            <div class="group-tags">
+                                <span class="tag">Fisika</span>
+                                <span class="tag">IPA</span>
+                            </div>
+                            <button class="btn btn-primary join-btn">Gabung Grup</button>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-header">
+                                <h3 class="group-title">Bahasa Inggris Club</h3>
+                                <div class="group-members">
+                                    <i class="fas fa-users"></i>
+                                    <span>32 anggota</span>
+                                </div>
+                            </div>
+                            <p class="group-description">Practice English together and improve speaking skills</p>
+                            <div class="group-tags">
+                                <span class="tag">Bahasa Inggris</span>
+                                <span class="tag">Speaking</span>
+                            </div>
+                            <button class="btn btn-primary join-btn">Gabung Grup</button>
+                        </div>
+                        <div class="group-card">
+                            <div class="group-header">
+                                <h3 class="group-title">Study Buddies</h3>
+                                <div class="group-members">
+                                    <i class="fas fa-users"></i>
+                                    <span>15 anggota</span>
+                                </div>
+                            </div>
+                            <p class="group-description">Grup belajar umum untuk semua mata pelajaran</p>
+                            <div class="group-tags">
+                                <span class="tag">Umum</span>
+                                <span class="tag">Semua Pelajaran</span>
+                            </div>
+                            <button class="btn btn-primary join-btn">Gabung Grup</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Group Modal -->
+            <div class="modal" id="createGroupModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="closeCreateGroupModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="modal-title">Buat Grup Baru</h2>
+                    <form id="createGroupForm">
+                        <div class="form-group">
+                            <label class="form-label">Nama Grup</label>
+                            <input type="text" class="form-control" id="groupName" placeholder="Masukkan nama grup">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="groupDescription" rows="3" placeholder="Deskripsikan grup Anda"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mata Pelajaran</label>
+                            <select class="form-select" id="groupSubject">
+                                <option value="math">Matematika</option>
+                                <option value="physics">Fisika</option>
+                                <option value="chemistry">Kimia</option>
+                                <option value="biology">Biologi</option>
+                                <option value="indonesian">Bahasa Indonesia</option>
+                                <option value="english">Bahasa Inggris</option>
+                                <option value="economics">Ekonomi</option>
+                                <option value="sociology">Sosiologi</option>
+                                <option value="geography">Geografi</option>
+                                <option value="history">Sejarah</option>
+                                <option value="general">Umum</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Kelas</label>
+                            <select class="form-select" id="groupClass">
+                                <option value="x">Kelas X</option>
+                                <option value="xi">Kelas XI</option>
+                                <option value="xii">Kelas XII</option>
+                                <option value="all">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buat Grup</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Group Chat Modal -->
+            <div class="modal" id="groupChatModal">
+                <div class="modal-content" style="max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+                    <button class="modal-close" id="closeGroupChatModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="modal-title" id="groupChatTitle">Nama Grup</h2>
+                    <div class="chat-container" style="flex: 1; overflow-y: auto; padding: 1rem; background-color: var(--light-bg); border-radius: 10px; margin-bottom: 1rem;">
+                        <div class="chat-message" style="margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                                <div class="user-avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">A</div>
+                                <div style="background-color: white; padding: 0.75rem; border-radius: 10px; max-width: 70%;">
+                                    <p style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.25rem;">Andi</p>
+                                    <p>Halo teman-teman, siap untuk belajar hari ini?</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-message" style="margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: flex-start; gap: 0.5rem; justify-content: flex-end;">
+                                <div style="background-color: var(--primary-color); color: white; padding: 0.75rem; border-radius: 10px; max-width: 70%;">
+                                    <p style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.25rem;">Anda</p>
+                                    <p>Siap! Materi apa yang akan kita bahas hari ini?</p>
+                                </div>
+                                <div class="user-avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">G</div>
+                            </div>
+                        </div>
+                        <div class="chat-message" style="margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                                <div class="user-avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">S</div>
+                                <div style="background-color: white; padding: 0.75rem; border-radius: 10px; max-width: 70%;">
+                                    <p style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.25rem;">Siti</p>
+                                    <p>Saya ada catatan tentang bab 2, mau saya upload?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container" style="display: flex; gap: 0.5rem;">
+                        <input type="text" class="form-control" id="chatInput" placeholder="Ketik pesan...">
+                        <button class="btn btn-primary" id="sendChatBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" id="uploadFileBtn">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planner Page -->
+        <div id="plannerPage" class="page hidden">
+            <section class="planner-container">
+                <div class="container">
+                    <h2 class="section-title">Planner Belajar</h2>
+                    <div class="planner-tabs">
+                        <button class="tab active" data-tab="todo">To-Do List</button>
+                        <button class="tab" data-tab="schedule">Jadwal Belajar</button>
+                    </div>
+                    <div class="tab-content active" id="todo">
+                        <div class="todo-list">
+                            <div class="todo-header">
+                                <h3>Tugas Sekolah</h3>
+                                <button class="btn btn-primary" id="addTodoBtn">Tambah Tugas</button>
+                            </div>
+                            <div class="todo-items" id="todoItems">
+                                <div class="todo-item">
+                                    <input type="checkbox" class="todo-checkbox" id="todo1">
+                                    <label for="todo1" class="todo-text">Mengerjakan PR Matematika Bab 3</label>
+                                    <div class="todo-actions">
+                                        <button class="todo-btn edit-todo" data-id="1">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="todo-btn delete-todo" data-id="1">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="todo-item">
+                                    <input type="checkbox" class="todo-checkbox" id="todo2">
+                                    <label for="todo2" class="todo-text">Membaca Bab 4 Fisika</label>
+                                    <div class="todo-actions">
+                                        <button class="todo-btn edit-todo" data-id="2">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="todo-btn delete-todo" data-id="2">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="todo-item completed">
+                                    <input type="checkbox" class="todo-checkbox" id="todo3" checked>
+                                    <label for="todo3" class="todo-text">Mengerjakan essay Bahasa Indonesia</label>
+                                    <div class="todo-actions">
+                                        <button class="todo-btn edit-todo" data-id="3">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="todo-btn delete-todo" data-id="3">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="schedule">
+                        <div class="schedule-grid">
+                            <div class="schedule-day">
+                                <div class="day-header">Senin</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">08:00 - Matematika</div>
+                                    <div class="schedule-item">10:00 - Fisika</div>
+                                    <div class="schedule-item">13:00 - Bahasa Indonesia</div>
+                                    <div class="schedule-item">15:00 - Belajar Kelompok</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Selasa</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">08:00 - Kimia</div>
+                                    <div class="schedule-item">10:00 - Biologi</div>
+                                    <div class="schedule-item">13:00 - Bahasa Inggris</div>
+                                    <div class="schedule-item">15:00 - Latihan Soal</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Rabu</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">08:00 - Matematika</div>
+                                    <div class="schedule-item">10:00 - Ekonomi</div>
+                                    <div class="schedule-item">13:00 - Sejarah</div>
+                                    <div class="schedule-item">15:00 - Review Materi</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Kamis</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">08:00 - Fisika</div>
+                                    <div class="schedule-item">10:00 - Sosiologi</div>
+                                    <div class="schedule-item">13:00 - Geografi</div>
+                                    <div class="schedule-item">15:00 - Belajar Mandiri</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Jumat</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">08:00 - Kimia</div>
+                                    <div class="schedule-item">10:00 - Matematika</div>
+                                    <div class="schedule-item">13:00 - Bahasa Indonesia</div>
+                                    <div class="schedule-item">15:00 - Quiz Online</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Sabtu</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">09:00 - Review Mingguan</div>
+                                    <div class="schedule-item">11:00 - Belajar Kelompok</div>
+                                    <div class="schedule-item">14:00 - Latihan Soal</div>
+                                    <div class="schedule-item">16:00 - Istirahat</div>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <div class="day-header">Minggu</div>
+                                <div class="day-schedule">
+                                    <div class="schedule-item">09:00 - Review Materi</div>
+                                    <div class="schedule-item">11:00 - Persiapan Ujian</div>
+                                    <div class="schedule-item">14:00 - Rekreasi</div>
+                                    <div class="schedule-item">16:00 - Istirahat</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Todo Modal -->
+            <div class="modal" id="addTodoModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="closeAddTodoModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="modal-title">Tambah Tugas Baru</h2>
+                    <form id="addTodoForm">
+                        <div class="form-group">
+                            <label class="form-label">Nama Tugas</label>
+                            <input type="text" class="form-control" id="todoName" placeholder="Masukkan nama tugas">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mata Pelajaran</label>
+                            <select class="form-select" id="todoSubject">
+                                <option value="math">Matematika</option>
+                                <option value="physics">Fisika</option>
+                                <option value="chemistry">Kimia</option>
+                                <option value="biology">Biologi</option>
+                                <option value="indonesian">Bahasa Indonesia</option>
+                                <option value="english">Bahasa Inggris</option>
+                                <option value="economics">Ekonomi</option>
+                                <option value="sociology">Sosiologi</option>
+                                <option value="geography">Geografi</option>
+                                <option value="history">Sejarah</option>
+                                <option value="general">Umum</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Deadline</label>
+                            <input type="date" class="form-control" id="todoDeadline">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Tambah Tugas</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forum Page -->
+        <div id="forumPage" class="page hidden">
+            <section class="forum-container">
+                <div class="container">
+                    <div class="forum-header">
+                        <h2 class="section-title">Forum Tanya Jawab</h2>
+                        <button class="btn btn-primary" id="askQuestionBtn">Ajukan Pertanyaan</button>
+                    </div>
+                    <div class="forum-posts">
+                        <div class="forum-post">
+                            <div class="post-header">
+                                <div class="post-author">
+                                    <div class="post-author-avatar">R</div>
+                                    <div class="post-author-info">
+                                        <h4>Rina Wijaya</h4>
+                                        <p>2 jam yang lalu</p>
+                                    </div>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="post-action">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>12</span>
+                                    </button>
+                                    <button class="post-action">
+                                        <i class="fas fa-comment"></i>
+                                        <span>5</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                <h3>Cara menyelesaikan persamaan kuadrat?</h3>
+                                <p>Saya kesulitan menyelesaikan persamaan kuadrat ax² + bx + c = 0. Apa saja metode yang bisa digunakan dan kapan waktu yang tepat untuk menggunakan setiap metode?</p>
+                                <div class="post-tags">
+                                    <span class="tag">Matematika</span>
+                                    <span class="tag">Aljabar</span>
+                                </div>
+                            </div>
+                            <div class="post-responses">
+                                <h4>5 Jawaban</h4>
+                                <div class="response">
+                                    <div class="response-avatar">B</div>
+                                    <div class="response-content">
+                                        <div class="response-header">
+                                            <span class="response-author">Budi Santoso</span>
+                                            <span class="response-time">1 jam yang lalu</span>
+                                        </div>
+                                        <p>Ada 3 metode utama untuk menyelesaikan persamaan kuadrat: faktorisasi, rumus kuadrat, dan melengkapkan kuadrat sempurna. Faktorisasi paling cepat jika koefisiennya sederhana.</p>
+                                    </div>
+                                </div>
+                                <div class="response">
+                                    <div class="response-avatar">D</div>
+                                    <div class="response-content">
+                                        <div class="response-header">
+                                            <span class="response-author">Diana Putri</span>
+                                            <span class="response-time">30 menit yang lalu</span>
+                                        </div>
+                                        <p>Rumus kuadrat (abc) adalah metode paling universal, bisa digunakan untuk semua jenis persamaan kuadrat. Rumusnya: x = (-b ± √(b²-4ac)) / 2a</p>
+                                    </div>
+                                </div>
+                                <div class="response-form">
+                                    <input type="text" class="response-input" placeholder="Tulis jawaban Anda...">
+                                    <button class="btn btn-primary">Kirim</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="forum-post">
+                            <div class="post-header">
+                                <div class="post-author">
+                                    <div class="post-author-avatar">A</div>
+                                    <div class="post-author-info">
+                                        <h4>Andi Pratama</h4>
+                                        <p>5 jam yang lalu</p>
+                                    </div>
+                                </div>
+                                <div class="post-actions">
+                                    <button class="post-action">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>8</span>
+                                    </button>
+                                    <button class="post-action">
+                                        <i class="fas fa-comment"></i>
+                                        <span>3</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                <h3>Perbedaan antara sel prokariotik dan eukariotik</h3>
+                                <p>Saya bingung membedakan sel prokariotik dan eukariotik. Apa saja perbedaan utamanya dan contoh organisme yang memiliki jenis sel tersebut?</p>
+                                <img src="https://picsum.photos/seed/cell-biology/600/300.jpg" alt="Cell Biology" class="post-image">
+                                <div class="post-tags">
+                                    <span class="tag">Biologi</span>
+                                    <span class="tag">Sel</span>
+                                </div>
+                            </div>
+                            <div class="post-responses">
+                                <h4>3 Jawaban</h4>
+                                <div class="response">
+                                    <div class="response-avatar">S</div>
+                                    <div class="response-content">
+                                        <div class="response-header">
+                                            <span class="response-author">Siti Nurhaliza</span>
+                                            <span class="response-time">3 jam yang lalu</span>
+                                        </div>
+                                        <p>Perbedaan utama: sel prokariotik tidak memiliki inti sel yang terbungkus membran, sedangkan eukariotik memiliki inti sel yang terbungkus membran. Contoh prokariotik: bakteri, archaea. Contoh eukariotik: tumbuhan, hewan, jamur.</p>
+                                    </div>
+                                </div>
+                                <div class="response-form">
+                                    <input type="text" class="response-input" placeholder="Tulis jawaban Anda...">
+                                    <button class="btn btn-primary">Kirim</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ask Question Modal -->
+            <div class="modal" id="askQuestionModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="closeAskQuestionModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="modal-title">Ajukan Pertanyaan</h2>
+                    <form id="askQuestionForm">
+                        <div class="form-group">
+                            <label class="form-label">Judul Pertanyaan</label>
+                            <input type="text" class="form-control" id="questionTitle" placeholder="Tulis judul pertanyaan yang jelas">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mata Pelajaran</label>
+                            <select class="form-select" id="questionSubject">
+                                <option value="math">Matematika</option>
+                                <option value="physics">Fisika</option>
+                                <option value="chemistry">Kimia</option>
+                                <option value="biology">Biologi</option>
+                                <option value="indonesian">Bahasa Indonesia</option>
+                                <option value="english">Bahasa Inggris</option>
+                                <option value="economics">Ekonomi</option>
+                                <option value="sociology">Sosiologi</option>
+                                <option value="geography">Geografi</option>
+                                <option value="history">Sejarah</option>
+                                <option value="general">Umum</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Detail Pertanyaan</label>
+                            <textarea class="form-control" id="questionDetail" rows="5" placeholder="Jelaskan pertanyaan Anda dengan detail"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Upload Gambar (Opsional)</label>
+                            <input type="file" class="form-control" id="questionImage" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajukan Pertanyaan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="aboutPage" class="page hidden">
+            <section class="about-container">
+                <div class="container">
+                    <h2 class="section-title">Tentang StudyPal</h2>
+                    <div class="about-content">
+                        <div class="about-text">
+                            <h2>Misi Kami</h2>
+                            <p>StudyPal didirikan dengan misi menyediakan platform pembelajaran gratis dan berkualitas untuk siswa SMA di seluruh Indonesia. Kami percaya bahwa setiap siswa berhak mendapatkan akses pendidikan yang baik tanpa terhalang oleh biaya.</p>
+                            <p>Dengan StudyPal, siswa dapat belajar secara mandiri atau berkolaborasi dengan teman-teman lainnya. Kami menyediakan materi pembelajaran yang komprehensif, latihan soal dengan pembahasan, serta fitur-fitur interaktif untuk membuat proses belajar menjadi lebih menyenangkan.</p>
+                            <p>StudyPal 100% gratis dan tidak ada sistem membership atau fitur premium. Kami berkomitmen untuk terus mengembangkan platform ini demi kemajuan pendidikan di Indonesia.</p>
+                        </div>
+                        <div class="about-image">
+                            <img src="https://picsum.photos/seed/studypal-team/500/400.jpg" alt="StudyPal Team">
+                        </div>
+                    </div>
+
+                    <div class="team">
+                        <h2 class="section-title">Tim StudyPal</h2>
+                        <div class="team-grid">
+                            <div class="team-member">
+                                <div class="member-avatar">A</div>
+                                <h3 class="member-name">Ahmad Fadli</h3>
+                                <p class="member-role">Founder & CEO</p>
+                                <div class="member-social">
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">R</div>
+                                <h3 class="member-name">Rina Wijaya</h3>
+                                <p class="member-role">Head of Content</p>
+                                <div class="member-social">
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">B</div>
+                                <h3 class="member-name">Budi Santoso</h3>
+                                <p class="member-role">Lead Developer</p>
+                                <div class="member-social">
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="team-member">
+                                <div class="member-avatar">S</div>
+                                <h3 class="member-name">Siti Nurhaliza</h3>
+                                <p class="member-role">UI/UX Designer</p>
+                                <div class="member-social">
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="#" class="social-link">
+                                        <i class="fab fa-dribbble"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>StudyPal</h3>
+                    <p>Platform belajar gratis untuk siswa SMA</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Fitur</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Materi Pelajaran</a></li>
+                        <li><a href="#">Latihan Soal</a></li>
+                        <li><a href="#">Grup Belajar</a></li>
+                        <li><a href="#">Planner</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Bantuan</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Kontak Kami</a></li>
+                        <li><a href="#">Kebijakan Privasi</a></li>
+                        <li><a href="#">Syarat & Ketentuan</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Ikuti Kami</h3>
+                    <div class="member-social">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 StudyPal. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
-  </main>
 
-  <!-- Modal: Login/Register -->
-  <div id="modal" class="modal-backdrop">
-    <div class="modal">
-      <h3 id="modalTitle">Login / Register</h3>
-      <p class="small" id="modalDesc">Masukkan nama pengguna dan pilih jenjang untuk mulai menggunakan StudyPal</p>
-      <input id="inputName" class="input" placeholder="Nama lengkap atau nama panggilan" style="margin-bottom:12px"/>
-      <select id="inputJenjang" class="input">
-        <option value="">Pilih Jenjang</option>
-        <option value="SD">SD (Sekolah Dasar)</option>
-        <option value="SMP">SMP (Sekolah Menengah Pertama)</option>
-        <option value="SMA">SMA (Sekolah Menengah Atas)</option>
-      </select>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-        <button class="btn secondary" id="modalCancel">Batal</button>
-        <button class="btn" id="modalSave">Simpan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Quiz -->
-  <div id="modalQuiz" class="modal-backdrop">
-    <div class="modal" style="max-width:520px">
-      <h3 id="quizTitle">Kuis Cepat</h3>
-      <p class="small" id="quizDesc">Soal acak untuk latihan.</p>
-      <p class="small" style="color: var(--muted); font-style: italic;">*Fitur ini masih dalam tahap pengembangan.</p>
-      <div id="quizContent" style="margin-top:8px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
-        <div id="quizResult" class="small"></div>
-        <div>
-          <button class="btn secondary" id="quizClose">Tutup</button>
-          <button class="btn" id="quizSubmit">Kirim Jawaban</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /***************
-     * StudyPal Prototype JS
-     * - Simple SPA behavior
-     * - localStorage for persistence (groups & posts & username)
-     * - Multi jenjang with different subjects
-     * - Embedded questions for quizzes (3 per subject)
-     ***************/
-
-    // --- Jenjang and Subjects Configuration ---
-    const JENJANG_CONFIG = {
-      SD: {
-        name: "SD",
-        subjects: [
-          { name: "Matematika", icon: "📐", class: "s-math" },
-          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
-          { name: "IPA", icon: "🔬", class: "s-bio" },
-          { name: "IPS", icon: "🌍", class: "s-ips" }
-        ]
-      },
-      SMP: {
-        name: "SMP",
-        subjects: [
-          { name: "Matematika", icon: "📐", class: "s-math" },
-          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
-          { name: "IPA", icon: "🔬", class: "s-bio" },
-          { name: "IPS", icon: "🌍", class: "s-ips" },
-          { name: "Bahasa Inggris", icon: "🇬🇧", class: "s-eng" }
-        ]
-      },
-      SMA: {
-        name: "SMA",
-        subjects: [
-          { name: "Matematika", icon: "📐", class: "s-math" },
-          { name: "Fisika", icon: "⚡", class: "s-phys" },
-          { name: "Biologi", icon: "🧬", class: "s-bio" },
-          { name: "Kimia", icon: "🧪", class: "s-kimia" },
-          { name: "Bahasa Indonesia", icon: "📖", class: "s-indo" },
-          { name: "Bahasa Inggris", icon: "🇬🇧", class: "s-eng" },
-          { name: "Ekonomi", icon: "💰", class: "s-eko" },
-          { name: "Geografi", icon: "🗺️", class: "s-geo" },
-          { name: "Sejarah", icon: "📜", class: "s-sej" },
-          { name: "Sosiologi", icon: "👥", class: "s-sos" }
-        ]
-      }
-    };
-
-    // --- Embedded Questions Bank (3 per subject) ---
-    const QUESTIONS_BANK = {
-      SD: {
-        "Matematika": [
-          { q: "Hasil dari 5 + 3 adalah...", a: ["7", "8", "9"], correct: 1 },
-          { q: "Angka romawi untuk 10 adalah...", a: ["V", "X", "L"], correct: 1 },
-          { q: "Bentuk dari segitiga memiliki... sisi", a: ["2", "3", "4"], correct: 1 }
-        ],
-        "Bahasa Indonesia": [
-          { q: "Kata 'bermain' adalah kata...", a: ["Benda", "Kerja", "Sifat"], correct: 1 },
-          { q: "Huruf kapital untuk awal kalimat adalah huruf...", a: ["Kecil", "Besar", "Miring"], correct: 1 },
-          { q: "Siapa nama tokoh dalam cerita 'Malin Kundang'?", a: ["Bawang Merah", "Malin Kundang", "Timun Mas"], correct: 1 }
-        ],
-        "IPA": [
-          { q: "Sumber energi matahari berasal dari...", a: ["Bumi", "Angkasa", "Air"], correct: 1 },
-          { q: "Hewan yang bernapas dengan insang adalah...", a: ["Kucing", "Ikan", "Ayam"], correct: 1 },
-          { q: "Bagian tumbuhan yang menyerap air adalah...", a: ["Daun", "Akar", "Batang"], correct: 1 }
-        ],
-        "IPS": [
-          { q: "Ibukota Indonesia adalah...", a: ["Surabaya", "Jakarta", "Bandung"], correct: 1 },
-          { q: "Profesi seseorang yang mengajar di sekolah disebut...", a: ["Dokter", "Guru", "Polisi"], correct: 1 },
-          { q: "Alat untuk menunjukkan arah disebut...", a: ["Peta", "Kompas", "Globe"], correct: 1 }
-        ]
-      },
-      SMP: {
-        "Matematika": [
-          { q: "Hasil dari (2 + 3) x 4 adalah...", a: ["20", "14", "11"], correct: 0 },
-          { q: "Persamaan garis lurus dengan gradien 2 dan melalui titik (0,3) adalah...", a: ["y = 2x + 3", "y = 3x + 2", "y = 2x - 3"], correct: 0 },
-          { q: "Akar kuadrat dari 144 adalah...", a: ["10", "11", "12"], correct: 2 }
-        ],
-        "Bahasa Indonesia": [
-          { q: "Kalimat yang berisi perintah disebut kalimat...", a: ["Berita", "Tanya", "Perintah"], correct: 2 },
-          { q: "Majas perbandingan yang menggunakan kata 'bagai' atau 'laksana' disebut...", a: ["Personifikasi", "Simile", "Metafora"], correct: 1 },
-          { q: "Struktur teks eksposisi terdiri dari tesis, argumen, dan...", a: ["Koda", "Konklusi", "Orientasi"], correct: 1 }
-        ],
-        "IPA": [
-          { q: "Zat yang tersusun dari satu jenis atom disebut...", a: ["Senyawa", "Unsur", "Campuran"], correct: 1 },
-          { q: "Gaya yang bekerja pada benda yang bergerak melingkar disebut...", a: ["Gaya sentripetal", "Gaya sentrifugal", "Gaya gravitasi"], correct: 0 },
-          { q: "Organel sel yang berfungsi sebagai tempat respirasi seluler adalah...", a: ["Nukleus", "Mitokondria", "Kloroplas"], correct: 1 }
-        ],
-        "IPS": [
-          { q: "Pendorong utama kegiatan ekonomi masyarakat adalah...", a: ["Kebutuhan", "Keinginan", "Permintaan"], correct: 0 },
-          { q: "Lembaga sosial yang dibentuk untuk menjaga ketertiban masyarakat adalah...", a: ["Keluarga", "Negara", "Sekolah"], correct: 1 },
-          { q: "Letak geografis Indonesia yang sangat strategis karena berada di antara dua samudra adalah...", a: ["Asia dan Australia", "Samudra Hindia dan Pasifik", "Benua Asia dan Eropa"], correct: 1 }
-        ],
-        "Bahasa Inggris": [
-          { q: "I ____ to school every day.", a: ["go", "goes", "went"], correct: 0 },
-          { q: "She is ____ than her sister.", a: ["tall", "taller", "tallest"], correct: 1 },
-          { q: "The book is ____ the table.", a: ["in", "on", "at"], correct: 1 }
-        ]
-      },
-      SMA: {
-        "Matematika": [
-          { q: "Turunan pertama dari f(x) = 3x² + 2x - 5 adalah...", a: ["6x + 2", "6x - 2", "3x + 2"], correct: 0 },
-          { q: "Jika sin A = 3/5, maka cos A adalah...", a: ["4/5", "5/4", "3/4"], correct: 0 },
-          { q: "Limit dari (x² - 4) / (x - 2) saat x mendekati 2 adalah...", a: ["0", "2", "4"], correct: 2 }
-        ],
-        "Fisika": [
-          { q: "Benda bermassa 2 kg dikenai gaya 10 N. Percepatan benda tersebut adalah...", a: ["5 m/s²", "10 m/s²", "20 m/s²"], correct: 0 },
-          { q: "Energi kinetik benda bermassa 4 kg yang bergerak dengan kecepatan 3 m/s adalah...", a: ["12 J", "18 J", "24 J"], correct: 1 },
-          { q: "Hukum II Newton menyatakan bahwa resultan gaya sama dengan...", a: ["Massa x Percepatan", "Massa / Percepatan", "Percepatan / Massa"], correct: 0 }
-        ],
-        "Biologi": [
-          { q: "Enzim yang menghancurkan protein dalam makanan adalah...", a: ["Amilase", "Protease", "Lipase"], correct: 1 },
-          { q: "Pernapasan yang menghasilkan energi paling banyak adalah...", a: ["Anaerob", "Aerob", "Fermentasi"], correct: 1 },
-          { q: "Fotosintesis terjadi di dalam organel bernama...", a: ["Mitokondria", "Kloroplas", "Ribosom"], correct: 1 }
-        ],
-        "Kimia": [
-          { q: "Jumlah mol dalam 5,4 gram air (H₂O, Ar H=1, O=16) adalah...", a: ["0,1 mol", "0,3 mol", "0,5 mol"], correct: 1 },
-          { q: "Reaksi pengikatan antara ion positif dan ion negatif disebut...", a: ["Ikatan Kovalen", "Ikatan Ion", "Ikatan Logam"], correct: 1 },
-          { q: "Unsur yang paling elektronegatif adalah...", a: ["Natrium", "Fluor", "Oksigen"], correct: 1 }
-        ],
-        "Bahasa Indonesia": [
-          { q: "Novel 'Siti Nurbaya' karya Marah Rusli termasuk angkatan...", a: ["Balai Pustaka", "Pujangga Baru", "66"], correct: 0 },
-          { q: "Kalimat yang mengandung pertentangan makna antara bagian sebelum dan sesudah koma disebut...", a: ["Paralelisme", "Antitesis", "Elipsis"], correct: 1 },
-          { q: "Nilai dalam sebuah cerita yang berkaitan dengan kebenaran umum disebut nilai...", a: ["Religius", "Sosial", "Universal"], correct: 2 }
-        ],
-        "Bahasa Inggris": [
-          { q: "If I had studied harder, I ____ the exam.", a: ["would pass", "would have passed", "will pass"], correct: 1 },
-          { q: "The train ____ by the time I arrived at the station.", a: ["had left", "has left", "leaves"], correct: 0 },
-          { q: "He suggested ____ a break.", a: ["to take", "taking", "take"], correct: 1 }
-        ],
-        "Ekonomi": [
-          { q: "Kebijakan pemerintah untuk menaikkan suku bunga bertujuan untuk...", a: ["Meningkatkan inflasi", "Mengurangi inflasi", "Meningkatkan investasi"], correct: 1 },
-          { q: "Badan usaha yang modalnya berasal dari masyarakat umum adalah...", a: ["BUMN", "BUMD", "Perseroan Terbatas"], correct: 2 },
-          { q: "Pajak yang beban pemungutannya dapat dialihkan kepada pihak lain disebut pajak...", a: ["Langsung", "Tidak Langsung", "Subjek"], correct: 1 }
-        ],
-        "Geografi": [
-          { q: "Proses pelapukan batuan secara fisika oleh suhu yang ekstrem disebut...", a: ["Pelapukan kimia", "Pelapukan biologis", "Pelapukan fisik"], correct: 2 },
-          { q: "Lapisan atmosfer yang paling dekat dengan permukaan bumi adalah...", a: ["Troposfer", "Stratosfer", "Mesosfer"], correct: 0 },
-          { q: "Peta yang menunjukkan batas-batas administrasi suatu wilayah disebut peta...", a: ["Topografi", "Administrasi", "Tematik"], correct: 1 }
-        ],
-        "Sejarah": [
-          { q: "Pembacaan teks Proklamasi Kemerdekaan Indonesia dilakukan pada tanggal...", a: ["16 Agustus 1945", "17 Agustus 1945", "18 Agustus 1945"], correct: 1 },
-          { q: "Raja yang memerintah Kerajaan Majapahit pada masa keemasan adalah...", a: ["Raden Wijaya", "Hayam Wuruk", "Sriwijaya"], correct: 1 },
-          { q: "Kebijakan pemerintah Belanda yang membatasi kekuatan raja-raja lokal disebut...", a: ["Politik Etis", "Kultuur Stelsel", "Politik Balas Budi"], correct: 1 }
-        ],
-        "Sosiologi": [
-          { q: "Proses di mana individu mengadopsi norma dan nilai masyarakat disebut...", a: ["Interaksi", "Sosialisasi", "Akomodasi"], correct: 1 },
-          { q: "Kelompok sosial yang keanggotaannya didasarkan pada kedekatan emosional disebut...", a: ["Golongan", "Paguyuban", "Patembayan"], correct: 1 },
-          { q: "Perubahan sosial yang terjadi dengan cepat dan drastis disebut...", a: ["Evolusi", "Revolusi", "Reformasi"], correct: 1 }
-        ]
-      }
-    };
-
-    // --- Initial data ---
-    const SAMPLE_GROUPS = [
-      { id: genId(), name: "Kelas 5 SD", jenjang: "SD", subject: "Matematika", members: [], posts: [] },
-      { id: genId(), name: "Kelas 8 IPA", jenjang: "SMP", subject: "IPA", members: [], posts: [] },
-      { id: genId(), name: "Kelas 11 IPA 1", jenjang: "SMA", subject: "Fisika", members: [], posts: [] },
-      { id: genId(), name: "Reading Club", jenjang: "SMA", subject: "Bahasa Inggris", members: [], posts: [] }
-    ];
-    const STORAGE_KEY = 'studypal_data_v1';
-    const STORAGE_USER = 'studypal_user_v1';
-
-    // --- util ---
-    function genId(){ return 'id-' + Math.random().toString(36).slice(2,9) }
-    function saveData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) }
-    function loadData(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
-      try{ return JSON.parse(raw) } catch(e){ saveData(SAMPLE_GROUPS); return SAMPLE_GROUPS.slice() }
-    }
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    // --- state ---
-    let groups = loadData();
-    let currentUser = localStorage.getItem(STORAGE_USER) || null;
-    let currentUserJenjang = localStorage.getItem('studypal_jenjang') || 'SD';
-    let currentGroupId = null;
-    let currentJenjang = 'SD';
-    let currentQuizQuestions = [];
-
-    // --- elements ---
-    const btnLogin = document.getElementById('btn-login');
-    const userArea = document.getElementById('userArea');
-    const modal = document.getElementById('modal');
-    const modalSave = document.getElementById('modalSave');
-    const modalCancel = document.getElementById('modalCancel');
-    const inputName = document.getElementById('inputName');
-    const inputJenjang = document.getElementById('inputJenjang');
-    const startBtn = document.getElementById('startBtn');
-    const learnMoreBtn = document.getElementById('learnMore');
-    const mainArea = document.getElementById('mainArea');
-    const subjectQuick = document.getElementById('subjectQuick');
-    const jenjangSelector = document.getElementById('jenjangSelector');
-    const groupListEl = document.getElementById('groupList');
-    const btnCreateGroup = document.getElementById('btnCreateGroup');
-    const newGroupName = document.getElementById('newGroupName');
-    const newGroupSubject = document.getElementById('newGroupSubject');
-    const forumArea = document.getElementById('forumArea');
-    const groupTitle = document.getElementById('groupTitle');
-    const groupMeta = document.getElementById('groupMeta');
-    const postsContainer = document.getElementById('postsContainer');
-    const postText = document.getElementById('postText');
-    const btnPost = document.getElementById('btnPost');
-    const btnClearPost = document.getElementById('btnClearPost');
-    const avatarInitial = document.getElementById('avatarInitial');
-    const btnJoin = document.getElementById('btnJoin');
-    const btnLeave = document.getElementById('btnLeave');
-    const btnQuiz = document.getElementById('btn-quiz');
-    const btnQuizSubject = document.getElementById('btnQuizSubject');
-    const modalQuiz = document.getElementById('modalQuiz');
-    const quizTitle = document.getElementById('quizTitle');
-    const quizDesc = document.getElementById('quizDesc');
-    const quizContent = document.getElementById('quizContent');
-    const quizSubmit = document.getElementById('quizSubmit');
-    const quizClose = document.getElementById('quizClose');
-    const quizResult = document.getElementById('quizResult');
-
-    // --- init UI ---
-    function init(){
-      refreshUserUI();
-      renderJenjangSelector();
-      renderSubjectQuick();
-      renderGroupList();
-      attachListeners();
-      if(currentUser) {
-        document.getElementById('startBtn').textContent = 'Buka Dashboard';
-      }
-    }
-
-    function refreshUserUI(){
-      if(currentUser){
-        btnLogin.style.display='none';
-        userArea.style.display='flex';
-        userArea.textContent = `${currentUser} (${currentUserJenjang})`;
-        avatarInitial.textContent = currentUser.slice(0,1).toUpperCase();
-      } else {
-        btnLogin.style.display='inline-block';
-        userArea.style.display='none';
-      }
-    }
-
-    // --- render jenjang selector ---
-    function renderJenjangSelector(){
-      jenjangSelector.innerHTML = '';
-      Object.keys(JENJANG_CONFIG).forEach(jenjang => {
-        const btn = document.createElement('button');
-        btn.className = 'jenjang-btn' + (jenjang === currentJenjang ? ' active' : '');
-        btn.dataset.jenjang = jenjang;
-        btn.textContent = jenjang;
-        btn.addEventListener('click', () => selectJenjang(jenjang));
-        jenjangSelector.appendChild(btn);
-      });
-    }
-
-    // --- select jenjang ---
-    function selectJenjang(jenjang){
-      currentJenjang = jenjang;
-      document.querySelectorAll('.jenjang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.jenjang === jenjang);
-      });
-      renderSubjectQuick();
-      renderGroupList();
-      updateSubjectSelect();
-    }
-
-    // --- render quick subjects ---
-    function renderSubjectQuick(){
-      subjectQuick.innerHTML = '';
-      const subjects = JENJANG_CONFIG[currentJenjang].subjects;
-      
-      subjects.forEach(subject => {
-        const el = document.createElement('div');
-        el.className = 'subject';
-        el.style.cursor = 'pointer';
-        el.dataset.sub = subject.name;
-        el.innerHTML = `
-          <div class="icon ${subject.class}">${subject.icon}</div>
-          <div>
-            <div style="font-weight:700">${subject.name}</div>
-            <div class="small">Soal & diskusi</div>
-          </div>
-        `;
-        el.addEventListener('click', () => {
-          openDashboardForSubject(subject.name);
-        });
-        subjectQuick.appendChild(el);
-      });
-    }
-
-    // --- update subject select dropdown ---
-    function updateSubjectSelect(){
-      newGroupSubject.innerHTML = '';
-      const subjects = JENJANG_CONFIG[currentJenjang].subjects;
-      subjects.forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject.name;
-        option.textContent = subject.name;
-        newGroupSubject.appendChild(option);
-      });
-    }
-
-    // --- open dashboard for subject ---
-    function openDashboardForSubject(subject){
-      mainArea.style.display='grid';
-      renderGroupList(currentJenjang, subject);
-    }
-
-    // --- render groups ---
-    function renderGroupList(jenjangFilter, subjectFilter){
-      groupListEl.innerHTML = '';
-      let filtered = groups;
-      
-      if(jenjangFilter) {
-        filtered = filtered.filter(g => g.jenjang === jenjangFilter);
-      }
-      
-      if(subjectFilter) {
-        filtered = filtered.filter(g => g.subject === subjectFilter);
-      }
-      
-      filtered.forEach(g=>{
-        const el = document.createElement('div');
-        el.className = 'group-item' + (g.id === currentGroupId ? ' active' : '');
-        el.dataset.id = g.id;
-        el.innerHTML = `<strong>${g.name}</strong><div class="small" style="margin-top:6px">${g.jenjang} - ${g.subject} • ${g.members.length} anggota</div>`;
-        el.addEventListener('click', ()=> openGroup(g.id));
-        groupListEl.appendChild(el);
-      });
-    }
-
-    // --- open group view ---
-    function openGroup(groupId){
-      const g = groups.find(x=>x.id===groupId);
-      if(!g) return;
-      currentGroupId = groupId;
-      forumArea.style.display = 'block';
-      groupTitle.textContent = g.name;
-      groupMeta.textContent = `${g.jenjang} - ${g.subject} • ${g.members.length} anggota`;
-      const isMember = currentUser && g.members.includes(currentUser);
-      btnJoin.style.display = isMember ? 'none' : 'inline-block';
-      btnLeave.style.display = isMember ? 'inline-block' : 'none';
-      avatarInitial.textContent = currentUser ? currentUser.slice(0,1).toUpperCase() : 'A';
-      renderPosts(g.posts);
-      renderGroupList();
-    }
-
-    // --- render posts ---
-    function renderPosts(posts){
-      postsContainer.innerHTML = '';
-      if(!posts || posts.length===0){
-        postsContainer.innerHTML = `<div class="small">Belum ada postingan di grup ini. Ajak teman untuk berdiskusi!</div>`;
-        return;
-      }
-      posts.slice().reverse().forEach(post=>{
-        const el = document.createElement('div');
-        el.className = 'post';
-        el.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div style="font-weight:700">${escapeHtml(post.author)}</div>
-              <div class="meta">${new Date(post.time).toLocaleString()} • <span class="small">${post.title || 'Pertanyaan'}</span></div>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeLoginModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title">Masuk ke StudyPal</h2>
+            <div class="login-tabs">
+                <button class="login-tab active" data-tab="email">Email</button>
+                <button class="login-tab" data-tab="google">Google</button>
             </div>
-            <div class="small" style="color:var(--muted)">${post.upvotes || 0} 👍</div>
-          </div>
-          <div style="margin-top:8px">${escapeHtml(post.content).replace(/\n/g,'<br>')}</div>
-          <div class="reply-list" id="replies-${post.id}">
-            ${post.replies && post.replies.length ? post.replies.map(r => `<div style="background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #eef6fb"><strong>${escapeHtml(r.author)}</strong> <div class="small">${new Date(r.time).toLocaleString()}</div><div style="margin-top:6px">${escapeHtml(r.text)}</div></div>`).join('') : ''}
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input placeholder="Tulis balasan..." class="input" id="reply-input-${post.id}" />
-            <button class="btn secondary" onclick="handleReply('${post.id}')">Kirim</button>
-            <button class="btn" onclick="handleUpvote('${post.id}')">👍 Upvote</button>
-          </div>
-        `;
-        postsContainer.appendChild(el);
-      });
-    }
+            <div class="login-content active" id="emailLogin">
+                <form id="emailLoginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="Masukkan email Anda">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Masukkan password Anda">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Masuk</button>
+                </form>
+                <div class="divider">
+                    <span>atau</span>
+                </div>
+                <button class="google-btn" id="googleLoginBtn">
+                    <i class="fab fa-google"></i>
+                    Masuk dengan Google
+                </button>
+                <p class="text-center mt-1">Belum punya akun? <a href="#" id="registerLink">Daftar sekarang</a></p>
+            </div>
+            <div class="login-content" id="googleLogin">
+                <p style="text-align: center; margin-bottom: 2rem;">Masuk dengan akun Google Anda untuk mengakses semua fitur StudyPal</p>
+                <button class="google-btn" id="googleLoginBtn2">
+                    <i class="fab fa-google"></i>
+                    Masuk dengan Google
+                </button>
+                <p class="text-center mt-1">Belum punya akun? <a href="#" id="registerLink2">Daftar sekarang</a></p>
+            </div>
+        </div>
+    </div>
 
-    // --- make new group ---
-    function createGroup(name, jenjang, subject){
-      const g = { id: genId(), name: name || ('Grup ' + Math.floor(Math.random()*100)), jenjang: jenjang || currentJenjang, subject: subject || JENJANG_CONFIG[currentJenjang].subjects[0].name, members: [], posts: [] };
-      groups.push(g);
-      saveData(groups);
-      renderGroupList();
-      return g;
-    }
+    <script>
+        // DOM Elements
+        const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+        const pages = document.querySelectorAll('.page');
+        const themeToggle = document.getElementById('themeToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginTabs = document.querySelectorAll('.login-tab');
+        const loginContents = document.querySelectorAll('.login-content');
+        const startLearningBtn = document.getElementById('startLearningBtn');
+        const watchDemoBtn = document.getElementById('watchDemoBtn');
+        const subjectCards = document.querySelectorAll('.subject-card');
+        const subjectModal = document.getElementById('subjectModal');
+        const closeSubjectModal = document.getElementById('closeSubjectModal');
+        const subjectTabs = document.querySelectorAll('.subject-tabs .tab');
+        const subjectTabContents = document.querySelectorAll('.subject-content .tab-content');
+        const submitBtns = document.querySelectorAll('.submit-btn');
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        const createGroupModal = document.getElementById('createGroupModal');
+        const closeCreateGroupModal = document.getElementById('closeCreateGroupModal');
+        const joinBtns = document.querySelectorAll('.join-btn');
+        const groupChatModal = document.getElementById('groupChatModal');
+        const closeGroupChatModal = document.getElementById('closeGroupChatModal');
+        const plannerTabs = document.querySelectorAll('.planner-tabs .tab');
+        const plannerTabContents = document.querySelectorAll('.planner-container .tab-content');
+        const addTodoBtn = document.getElementById('addTodoBtn');
+        const addTodoModal = document.getElementById('addTodoModal');
+        const closeAddTodoModal = document.getElementById('closeAddTodoModal');
+        const todoCheckboxes = document.querySelectorAll('.todo-checkbox');
+        const askQuestionBtn = document.getElementById('askQuestionBtn');
+        const askQuestionModal = document.getElementById('askQuestionModal');
+        const closeAskQuestionModal = document.getElementById('closeAskQuestionModal');
+        const forumTabs = document.querySelectorAll('.forum-tabs .tab');
+        const forumTabContents = document.querySelectorAll('.forum-container .tab-content');
 
-    // --- post to group ---
-    function postToGroup(groupId, title, content){
-      const g = groups.find(x=>x.id===groupId);
-      if(!g) return;
-      const post = { id: genId(), author: currentUser||'Anonim', title: title||'', content: content||'', time: Date.now(), upvotes:0, replies:[] };
-      g.posts = g.posts || [];
-      g.posts.push(post);
-      saveData(groups);
-      renderPosts(g.posts);
-    }
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
 
-    // --- reply handler ---
-    window.handleReply = function(postId){
-      const input = document.getElementById('reply-input-'+postId);
-      if(!input) return;
-      const text = input.value.trim();
-      if(!text) return alert('Isi balasan dulu.');
-      const g = groups.find(x=>x.id===currentGroupId);
-      if(!g) return;
-      const p = g.posts.find(pp=>pp.id===postId);
-      if(!p) return;
-      p.replies = p.replies || [];
-      p.replies.push({ id: genId(), author: currentUser||'Anonim', text, time: Date.now() });
-      saveData(groups);
-      renderPosts(g.posts);
-    }
+            // Check for saved user data
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                updateUserInfo(user);
+            }
 
-    // --- upvote handler ---
-    window.handleUpvote = function(postId){
-      const g = groups.find(x=>x.id===currentGroupId);
-      if(!g) return;
-      const p = g.posts.find(pp=>pp.id===postId);
-      if(!p) return;
-      p.upvotes = (p.upvotes || 0) + 1;
-      saveData(groups);
-      renderPosts(g.posts);
-    }
+            // Check for saved todos
+            const savedTodos = localStorage.getItem('todos');
+            if (savedTodos) {
+                const todos = JSON.parse(savedTodos);
+                renderTodos(todos);
+            }
 
-    // --- QUIZ FUNCTIONS ---
-    function openQuizForGroup(groupId) {
-      const g = groups.find(x=>x.id===groupId);
-      if (!g) return;
-
-      quizTitle.textContent = `Latihan Soal: ${g.subject}`;
-      quizDesc.textContent = `Soal acak untuk jenjang ${g.jenjang}`;
-      modalQuiz.style.display = 'flex';
-      quizContent.innerHTML = '<div class="small">Memuat soal...</div>';
-      quizResult.textContent = '';
-
-      // Get questions from the local bank
-      const questionsForSubject = QUESTIONS_BANK[g.jenjang]?.[g.subject] || [];
-      if (questionsForSubject.length === 0) {
-        quizContent.innerHTML = '<div class="small">Belum ada soal untuk mata pelajaran ini.</div>';
-        return;
-      }
-
-      // Take 3 random questions
-      currentQuizQuestions = shuffleArray(questionsForSubject).slice(0, 3);
-      renderQuiz();
-    }
-
-    function renderQuiz(){
-      quizContent.innerHTML = '';
-      currentQuizQuestions.forEach((it, idx)=>{
-        const div = document.createElement('div');
-        div.style.marginBottom='10px';
-        div.innerHTML = `<div style="font-weight:700">${idx + 1}. ${it.q}</div>`;
-        it.a.forEach((opt, i)=>{
-          div.innerHTML += `<div style="margin-top:6px"><label><input type="radio" name="q${idx}" value="${i}"> ${opt}</label></div>`;
+            // Animate stats on scroll
+            animateStats();
         });
-        quizContent.appendChild(div);
-      });
-      quizResult.textContent = '';
-    }
 
-    function submitQuiz(){
-      let score = 0;
-      currentQuizQuestions.forEach((it, idx)=>{
-        const sel = document.querySelector(`input[name="q${idx}"]:checked`);
-        if (sel && Number(sel.value) === it.correct) {
-          score++;
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetPage = link.getAttribute('data-page');
+                showPage(targetPage);
+
+                // Update active nav link
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Close mobile menu if open
+                mobileMenu.classList.remove('show');
+            });
+        });
+
+        function showPage(pageId) {
+            pages.forEach(page => page.classList.add('hidden'));
+            document.getElementById(`${pageId}Page`).classList.remove('hidden');
         }
-      });
-      quizResult.textContent = `Skor: ${score} / ${currentQuizQuestions.length}`;
-    }
 
-    // --- attach listeners ---
-    function attachListeners(){
-      btnLogin.addEventListener('click', ()=> openModal());
-      startBtn.addEventListener('click', ()=>{
-        if(!currentUser) openModal();
-        else {
-          mainArea.style.display='grid';
-          renderGroupList();
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Mobile Menu
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('show');
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('show');
+        });
+
+        // Login Modal
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.add('show');
+        });
+
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.classList.remove('show');
+        });
+
+        loginTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                loginTabs.forEach(t => t.classList.remove('active'));
+                loginContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${targetTab}Login`).classList.add('active');
+            });
+        });
+
+        // Email Login Form
+        document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simple validation (in real app, this would be server-side)
+            if (email && password) {
+                const user = {
+                    name: email.split('@')[0],
+                    email: email,
+                    avatar: email[0].toUpperCase(),
+                    xp: Math.floor(Math.random() * 1000)
+                };
+
+                localStorage.setItem('user', JSON.stringify(user));
+                updateUserInfo(user);
+                loginModal.classList.remove('show');
+                showNotification('Login berhasil! Selamat datang di StudyPal.');
+            }
+        });
+
+        // Google Login
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            // Simulate Google login
+            const user = {
+                name: 'Google User',
+                email: 'user@gmail.com',
+                avatar: 'G',
+                xp: Math.floor(Math.random() * 1000)
+            };
+
+            localStorage.setItem('user', JSON.stringify(user));
+            updateUserInfo(user);
+            loginModal.classList.remove('show');
+            showNotification('Login dengan Google berhasil! Selamat datang di StudyPal.');
+        });
+
+        document.getElementById('googleLoginBtn2').addEventListener('click', () => {
+            // Simulate Google login
+            const user = {
+                name: 'Google User',
+                email: 'user@gmail.com',
+                avatar: 'G',
+                xp: Math.floor(Math.random() * 1000)
+            };
+
+            localStorage.setItem('user', JSON.stringify(user));
+            updateUserInfo(user);
+            loginModal.classList.remove('show');
+            showNotification('Login dengan Google berhasil! Selamat datang di StudyPal.');
+        });
+
+        // Update User Info
+        function updateUserInfo(user) {
+            const userInfo = document.getElementById('userInfo');
+            const userAvatar = userInfo.querySelector('.user-avatar');
+            const xpBadge = userInfo.querySelector('.xp-badge');
+
+            userAvatar.textContent = user.avatar;
+            xpBadge.textContent = `${user.xp} XP`;
+
+            loginBtn.textContent = 'Keluar';
+            loginBtn.removeEventListener('click', () => {
+                loginModal.classList.add('show');
+            });
+            loginBtn.addEventListener('click', () => {
+                localStorage.removeItem('user');
+                location.reload();
+            });
         }
-      });
-      
-      learnMoreBtn.addEventListener('click', () => {
-        alert('Fitur StudyPal:\n\n1. Forum Diskusi - Tanya jawab & solusi soal antar siswa\n2. Grup Belajar - Buat grup sesuai kelas atau topik\n3. Latihan Soal - Soal acak untuk setiap mata pelajaran\n4. Multi Jenjang - Dari SD hingga SMA dengan mata pelajaran yang berbeda');
-      });
-      
-      modalCancel.addEventListener('click', ()=> closeModal());
-      modalSave.addEventListener('click', ()=>{
-        const name = inputName.value.trim();
-        const jenjang = inputJenjang.value;
-        if(!name) return alert('Isi nama dulu.');
-        if(!jenjang) return alert('Pilih jenjang pendidikan.');
-        currentUser = name;
-        currentUserJenjang = jenjang;
-        currentJenjang = jenjang;
-        localStorage.setItem(STORAGE_USER, currentUser);
-        localStorage.setItem('studypal_jenjang', currentUserJenjang);
-        closeModal();
-        refreshUserUI();
-        document.getElementById('startBtn').textContent = 'Buka Dashboard';
-        renderJenjangSelector();
-        renderSubjectQuick();
-        updateSubjectSelect();
-      });
 
-      btnCreateGroup.addEventListener('click', ()=>{
-        const name = newGroupName.value.trim();
-        const subject = newGroupSubject.value;
-        if(!name) return alert('Masukkan nama grup.');
-        const g = createGroup(name, currentJenjang, subject);
-        newGroupName.value='';
-        openGroup(g.id);
-      });
+        // Start Learning Button
+        startLearningBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('materials');
+            navLinks.forEach(l => l.classList.remove('active'));
+            document.querySelector('[data-page="materials"]').classList.add('active');
+        });
 
-      btnPost.addEventListener('click', ()=>{
-        if(!currentUser) return openModal();
-        const text = postText.value.trim();
-        if(!text) return alert('Tulis pertanyaan atau catatan terlebih dahulu.');
-        postToGroup(currentGroupId, '', text);
-        postText.value='';
-      });
-      btnClearPost.addEventListener('click', ()=> postText.value='');
+        // Watch Demo Button
+        watchDemoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNotification('Video demo akan segera tersedia!');
+        });
 
-      btnJoin.addEventListener('click', ()=>{
-        if(!currentUser) return openModal();
-        const g = groups.find(x=>x.id===currentGroupId);
-        if(!g) return;
-        if(!g.members.includes(currentUser)) g.members.push(currentUser);
-        saveData(groups);
-        openGroup(g.id);
-      });
-      btnLeave.addEventListener('click', ()=>{
-        if(!currentUser) return openModal();
-        const g = groups.find(x=>x.id===currentGroupId);
-        if(!g) return;
-        g.members = g.members.filter(m=>m!==currentUser);
-        saveData(groups);
-        openGroup(g.id);
-      });
+        // Subject Cards
+        subjectCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const subject = card.getAttribute('data-subject');
+                showSubjectModal(subject);
+            });
+        });
 
-      // Quiz listeners
-      btnQuiz.addEventListener('click', () => {
-        if(currentGroupId) {
-          openQuizForGroup(currentGroupId);
-        } else {
-          alert('Silakan pilih grup terlebih dahulu untuk mengakses kuis.');
+        function showSubjectModal(subject) {
+            const subjectTitle = document.getElementById('subjectTitle');
+            const subjectNames = {
+                math: 'Matematika',
+                physics: 'Fisika',
+                chemistry: 'Kimia',
+                biology: 'Biologi',
+                indonesian: 'Bahasa Indonesia',
+                english: 'Bahasa Inggris',
+                economics: 'Ekonomi',
+                sociology: 'Sosiologi',
+                geography: 'Geografi',
+                history: 'Sejarah'
+            };
+
+            subjectTitle.textContent = `Materi ${subjectNames[subject]}`;
+            subjectModal.classList.add('show');
         }
-      });
-      
-      btnQuizSubject.addEventListener('click', () => {
-        if(currentGroupId) {
-          openQuizForGroup(currentGroupId);
-        } else {
-          alert('Silakan pilih grup terlebih dahulu untuk mengakses kuis.');
+
+        closeSubjectModal.addEventListener('click', () => {
+            subjectModal.classList.remove('show');
+        });
+
+        // Subject Tabs
+        subjectTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                subjectTabs.forEach(t => t.classList.remove('active'));
+                subjectTabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Submit Buttons for Practice Questions
+        submitBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const questionId = btn.getAttribute('data-question');
+                const explanation = document.getElementById(`explanation${questionId}`);
+                explanation.classList.add('show');
+                btn.disabled = true;
+                btn.textContent = 'Jawaban Dikirim';
+
+                // Add XP for answering question
+                addXP(10);
+            });
+        });
+
+        // Create Group
+        createGroupBtn.addEventListener('click', () => {
+            createGroupModal.classList.add('show');
+        });
+
+        closeCreateGroupModal.addEventListener('click', () => {
+            createGroupModal.classList.remove('show');
+        });
+
+        document.getElementById('createGroupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const groupName = document.getElementById('groupName').value;
+            const groupDescription = document.getElementById('groupDescription').value;
+            const groupSubject = document.getElementById('groupSubject').value;
+            const groupClass = document.getElementById('groupClass').value;
+
+            // In a real app, this would save to a database
+            showNotification(`Grup "${groupName}" berhasil dibuat!`);
+            createGroupModal.classList.remove('show');
+            document.getElementById('createGroupForm').reset();
+
+            // Add XP for creating group
+            addXP(20);
+        });
+
+        // Join Group
+        joinBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const groupCard = btn.closest('.group-card');
+                const groupTitle = groupCard.querySelector('.group-title').textContent;
+                
+                btn.textContent = 'Berhasil Bergabung';
+                btn.disabled = true;
+                
+                showNotification(`Anda berhasil bergabung dengan grup "${groupTitle}"!`);
+                
+                // Add XP for joining group
+                addXP(5);
+            });
+        });
+
+        // Group Chat
+        document.querySelectorAll('.join-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const groupCard = btn.closest('.group-card');
+                const groupTitle = groupCard.querySelector('.group-title').textContent;
+                
+                document.getElementById('groupChatTitle').textContent = groupTitle;
+                groupChatModal.classList.add('show');
+            });
+        });
+
+        closeGroupChatModal.addEventListener('click', () => {
+            groupChatModal.classList.remove('show');
+        });
+
+        document.getElementById('sendChatBtn').addEventListener('click', () => {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                // In a real app, this would save to a database
+                chatInput.value = '';
+                showNotification('Pesan terkirim!');
+                
+                // Add XP for sending message
+                addXP(2);
+            }
+        });
+
+        // Planner Tabs
+        plannerTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                plannerTabs.forEach(t => t.classList.remove('active'));
+                plannerTabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Add Todo
+        addTodoBtn.addEventListener('click', () => {
+            addTodoModal.classList.add('show');
+        });
+
+        closeAddTodoModal.addEventListener('click', () => {
+            addTodoModal.classList.remove('show');
+        });
+
+        document.getElementById('addTodoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const todoName = document.getElementById('todoName').value;
+            const todoSubject = document.getElementById('todoSubject').value;
+            const todoDeadline = document.getElementById('todoDeadline').value;
+
+            const newTodo = {
+                id: Date.now(),
+                name: todoName,
+                subject: todoSubject,
+                deadline: todoDeadline,
+                completed: false
+            };
+
+            // Get existing todos
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos.push(newTodo);
+            localStorage.setItem('todos', JSON.stringify(todos));
+
+            renderTodos(todos);
+            addTodoModal.classList.remove('show');
+            document.getElementById('addTodoForm').reset();
+            showNotification('Tugas berhasil ditambahkan!');
+
+            // Add XP for adding todo
+            addXP(5);
+        });
+
+        function renderTodos(todos) {
+            const todoItems = document.getElementById('todoItems');
+            todoItems.innerHTML = '';
+
+            todos.forEach(todo => {
+                const todoItem = document.createElement('div');
+                todoItem.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                todoItem.innerHTML = `
+                    <input type="checkbox" class="todo-checkbox" id="todo${todo.id}" ${todo.completed ? 'checked' : ''}>
+                    <label for="todo${todo.id}" class="todo-text">${todo.name}</label>
+                    <div class="todo-actions">
+                        <button class="todo-btn edit-todo" data-id="${todo.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="todo-btn delete-todo" data-id="${todo.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                todoItems.appendChild(todoItem);
+            });
+
+            // Add event listeners to new todo items
+            document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const todoId = parseInt(this.id.replace('todo', ''));
+                    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+                    const todoIndex = todos.findIndex(todo => todo.id === todoId);
+                    
+                    if (todoIndex !== -1) {
+                        todos[todoIndex].completed = this.checked;
+                        localStorage.setItem('todos', JSON.stringify(todos));
+                        
+                        const todoItem = this.closest('.todo-item');
+                        if (this.checked) {
+                            todoItem.classList.add('completed');
+                            addXP(10); // Add XP for completing todo
+                        } else {
+                            todoItem.classList.remove('completed');
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-todo').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const todoId = parseInt(this.getAttribute('data-id'));
+                    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+                    const filteredTodos = todos.filter(todo => todo.id !== todoId);
+                    localStorage.setItem('todos', JSON.stringify(filteredTodos));
+                    renderTodos(filteredTodos);
+                    showNotification('Tugas berhasil dihapus!');
+                });
+            });
         }
-      });
-      
-      quizClose.addEventListener('click', ()=> modalQuiz.style.display='none');
-      quizSubmit.addEventListener('click', submitQuiz);
-    }
 
-    // --- modal functions ---
-    function openModal(){
-      modal.style.display='flex';
-      inputName.value = currentUser || '';
-      inputJenjang.value = currentUserJenjang || '';
-      inputName.focus();
-    }
-    function closeModal(){ modal.style.display='none' }
+        // Ask Question
+        askQuestionBtn.addEventListener('click', () => {
+            askQuestionModal.classList.add('show');
+        });
 
-    // --- escape html ---
-    function escapeHtml(s){
-      if(!s) return '';
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+        closeAskQuestionModal.addEventListener('click', () => {
+            askQuestionModal.classList.remove('show');
+        });
 
-    // init app
-    init();
-    updateSubjectSelect();
+        document.getElementById('askQuestionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const questionTitle = document.getElementById('questionTitle').value;
+            const questionSubject = document.getElementById('questionSubject').value;
+            const questionDetail = document.getElementById('questionDetail').value;
 
-    // expose for debugging (optional)
-    window.__studypal = { groups, saveData, loadData };
-  </script>
-<footer style="background-color:#0d47a1;color:white;text-align:center;padding:20px 10px;margin-top:40px;">
-  <h3>StudyPal Official</h3>
-  <p>📍 Desa Bungur, Kecamatan Tulakan, Kabupaten Pacitan, Jawa TImur | 📧 support@studypal.id</p>
-  <div style="margin-top:10px;">
-    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">Instagram</a> |
-    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">YouTube</a> |
-    <a href="#" style="color:#bbdefb;margin:0 10px;text-decoration:none;">TikTok</a>
-  </div>
-  <p style="font-size:13px;color:#cfe2f5;margin-top:10px;">© 2025 StudyPal • Semua Hak Dilindungi</p>
-</footer>
+            // In a real app, this would save to a database
+            showNotification('Pertanyaan berhasil diajukan!');
+            askQuestionModal.classList.remove('show');
+            document.getElementById('askQuestionForm').reset();
+
+            // Add XP for asking question
+            addXP(15);
+        });
+
+        // Response Form
+        document.querySelectorAll('.response-form button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = btn.previousElementSibling;
+                const response = input.value.trim();
+                
+                if (response) {
+                    input.value = '';
+                    showNotification('Jawaban berhasil dikirim!');
+                    
+                    // Add XP for answering question
+                    addXP(20);
+                }
+            });
+        });
+
+        // Post Actions
+        document.querySelectorAll('.post-action').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const icon = btn.querySelector('i');
+                const count = btn.querySelector('span');
+                
+                if (icon.classList.contains('fa-arrow-up')) {
+                    const currentCount = parseInt(count.textContent);
+                    count.textContent = currentCount + 1;
+                    icon.style.color = 'var(--primary-color)';
+                    
+                    // Add XP for upvoting
+                    addXP(2);
+                }
+            });
+        });
+
+        // Helper Functions
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: var(--primary-color);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+                animation: fadeIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function addXP(amount) {
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                user.xp += amount;
+                localStorage.setItem('user', JSON.stringify(user));
+                updateUserInfo(user);
+                
+                // Show XP notification
+                showNotification(`+${amount} XP! Total: ${user.xp} XP`);
+            }
+        }
+
+        // Animate Stats
+        function animateStats() {
+            const stats = document.querySelectorAll('.stat-number');
+            const speed = 200;
+
+            stats.forEach(stat => {
+                const animate = () => {
+                    const value = +stat.getAttribute('data-val');
+                    const data = +stat.innerText;
+                    const time = value / speed;
+                    
+                    if (data < value) {
+                        stat.innerText = Math.ceil(data + time);
+                        setTimeout(animate, 1);
+                    } else {
+                        stat.innerText = value + stat.getAttribute('data-suffix');
+                    }
+                }
+                
+                // Set initial values
+                const text = stat.innerText;
+                const value = parseInt(text.replace(/\D/g, ''));
+                const suffix = text.replace(/\d/g, '');
+                
+                stat.setAttribute('data-val', value);
+                stat.setAttribute('data-suffix', suffix);
+                stat.innerText = '0';
+                
+                // Start animation when element is in viewport
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            animate();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                });
+                
+                observer.observe(stat);
+            });
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // Add fade out animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
